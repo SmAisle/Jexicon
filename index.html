@@ -200,11 +200,17 @@ body.oncover #dailyBar,body.oncover #top,body.oncover #pastTag,body.oncover #the
   <button class="mbtn" id="mStats">Stats</button>
   <button class="mbtn" id="mPract">Practice</button>
   <button class="mbtn y" id="mDaily">‹ smAisle Daily</button>
+  <button class="mbtn" id="mSet">Settings</button>
+  <div class="ver" id="menuVer"></div>
+</div></div>
+
+<div class="sheet" id="sSet" hidden><div class="box2">
+  <button class="x" data-close>×</button><h2>Settings</h2>
   <h3>Dark mode</h3>
   <div class="seg" id="dmSeg"><button data-m="off">Off</button><button data-m="on">On</button><button data-m="auto">Match phone</button></div>
   <h3>Sound</h3>
   <div class="seg" id="sndSeg"><button data-s="on">On</button><button data-s="off">Off</button></div>
-  <div class="ver" id="menuVer"></div>
+  <button class="mbtn" id="setBack" style="margin-top:16px">Back to the menu</button>
 </div></div>
 
 <div class="sheet" id="sHelp" hidden><div class="box2 help">
@@ -241,7 +247,7 @@ body.oncover #dailyBar,body.oncover #top,body.oncover #pastTag,body.oncover #the
 
 <script>
 /* ---------- Version (bump on every change; keep the Claude link and GitHub copies the same) ---------- */
-const VERSION='2.0',VDATE='Nov 2',GAME='jx';
+const VERSION='2.2',VDATE='Nov 2',GAME='jx';
 
 /* ---------- Daily themes. Day 1 is Nov 2, 2026; each day uses the next theme (cycles when the list runs out).
    Five words per day, easiest first. Every word is a noun, and the boxes show its length. ---------- */
@@ -551,6 +557,7 @@ $('menuBtn').onclick=()=>only('sMenu');
 $('mHelp').onclick=()=>only('sHelp');$('mArch').onclick=showArchive;$('mStats').onclick=showStats;$('mPract').onclick=practice;
 $('mDaily').onclick=goDaily;$('mHome').onclick=showCover;
 $('helpGo').addEventListener('click',()=>{if(!$('cover').hidden)hideCover();if(!agreed()){store.set(TERMS_KEY,new Date().toISOString());checkIn('open')}});
+$('mSet').onclick=()=>only('sSet');$('setBack').onclick=()=>only('sMenu');
 $('menuVer').textContent=`Jexicon · v${VERSION} · ${VDATE} · smAisle`;
 
 /* Dark mode: Off (smAisle colors, the default) / On (Navy) / Match phone. Shared on smaisle.app as localStorage "smaisle-dark". */
@@ -564,7 +571,7 @@ function dmApply(){const m=dmGet(),dark=m==='on'||(m==='auto'&&DM_MQ&&DM_MQ.matc
 document.querySelectorAll('#dmSeg button').forEach(b=>b.onclick=()=>{store.set('smaisle-dark',b.dataset.m);dmApply()});
 if(DM_MQ&&DM_MQ.addEventListener)DM_MQ.addEventListener('change',dmApply);
 
-/* ---------- Sound: little synth tones. On/off in the menu. ---------- */
+/* ---------- Sound: little synth tones. On/off in Settings. ---------- */
 let ac=null,acStale=false;const soundOn=()=>store.get('jx-sound','on')!=='off';
 function newAc(){ac=new (window.AudioContext||window.webkitAudioContext)();const b=ac.createBufferSource();b.buffer=ac.createBuffer(1,1,22050);b.connect(ac.destination);b.start(0)}
 function unlockAudio(){if(!soundOn()||(ac&&ac.state==='running'&&!acStale))return;acStale=false;
