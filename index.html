@@ -15,6 +15,7 @@ if(dark)document.documentElement.setAttribute('data-mode','navy')})();</script>
 <link rel="icon" href="icon-180.png">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="manifest" href="manifest.json">
+<script src="https://smaisle.app/daily/games.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,700&family=Libre+Baskerville:ital@0;1&family=Libre+Franklin:wght@500;600;700;800&display=swap">
 <style>
@@ -44,6 +45,10 @@ button{font:inherit;color:inherit;touch-action:manipulation;cursor:pointer}
 .pip{width:34px;height:44px;border:2px solid var(--line);background:var(--card);display:grid;place-items:center;font:800 14px var(--sans);color:var(--fade)}
 .pip.now{border-color:var(--ink);box-shadow:3px 3px 0 var(--shadow);color:var(--ink);transform:translateY(-2px)}
 .pip.lock{font-size:13px;opacity:.6}
+.more{margin:14px 0 0}.more-h{font:800 11px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin:14px 0 8px;text-align:center}
+.more-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}.more-row a{width:62px;text-decoration:none;color:var(--ink);text-align:center}
+.more-row img{width:52px;height:52px;border-radius:12px;border:2px solid var(--line);background:var(--card);display:block;margin:0 auto 4px}
+.more-row span{display:block;font:700 10px/1.2 var(--sans)}
 .gate{margin:18px 0 0;padding:16px;border:2px solid var(--line);background:var(--card);box-shadow:4px 4px 0 var(--shadow);text-align:center}
 .gate .star{display:inline-block;background:var(--hi);color:var(--hi-ink);border:2px solid var(--line);font:800 12px var(--sans);letter-spacing:.08em;padding:2px 8px}
 .gate h2{font:900 23px/1.2 var(--head);margin:10px 0 6px}.gate p{font:15px/1.5 var(--body);color:var(--ink2);margin:0}
@@ -241,7 +246,7 @@ body.oncover #dailyBar,body.oncover #top,body.oncover #pastTag,body.oncover #the
 
 <script>
 /* ---------- Version (bump on every change; keep the Claude link and GitHub copies the same) ---------- */
-const VERSION='2.0',VDATE='Nov 2',GAME='jx';
+const VERSION='2.1',VDATE='Nov 2',GAME='jx';
 
 /* ---------- Daily themes. Day 1 is Nov 2, 2026; each day uses the next theme (cycles when the list runs out).
    Five words per day, easiest first. Every word is a noun, and the boxes show its length. ---------- */
@@ -442,7 +447,7 @@ function drawGate(){
     <div class="word">${cap(w)}</div><div class="pos">noun</div><p class="def">${d}.</p><div class="stamp ${ok?'ok':'bad'}">${ok?'Spelled':'Missed'}</div></div>
   <div class="gate"><div class="star">★ PLUS</div><h2>Unlock the rest with smAisle Daily Plus</h2>
     <p>${ok?'Nice spelling! ':''}Plus gets you all 5 cards every day, the ⚡ beat-the-clock bonus round, Practice and the Archive.</p>
-    <button class="go hi" id="gateDaily" style="text-transform:none">‹ smAisle Daily</button></div>
+    <button class="go hi" id="gateDaily" style="text-transform:none">‹ smAisle Daily</button>${moreGames(true)}</div>
   <div class="small">This was today’s free preview of Jexicon.</div>`;
   $('gateDaily').onclick=goDaily;
 }
@@ -475,6 +480,16 @@ function demoRun(i,step){
   $('dmBoxes').innerHTML=h;const e=$('dmNote');e.innerHTML=note;e.className='dm-note '+cls;
   const done=cls!=='';demoT=setTimeout(()=>done?demoRun((i+1)%DEMO.length,0):demoRun(i,n+1),done?1800:(n===0?1100:650));
 }
+/* Finish screen standard (Nov 2): its own "‹ smAisle Daily" button, plus a "More smAisle games" row of the
+   other games' icons from https://smaisle.app/daily/games.js (window.SMAISLE.games), each linking to its game. */
+const MORE_FALLBACK=[['d15','The Daily 15','daily-15','DailyGrid'],['abc','A, B, C, Deal','abc-deal','abcdeal'],['gr','Gramble','gramble','gramble'],['cs','Capital Ship','capital-ship','CapitalShip'],['bw','Blipword','blipword','Blipword']]
+  .map(([id,name,ic,path])=>({id,name,icon:'https://smaisle.app/daily/icons/'+ic+'.png',url:'https://smaisle.app/'+path+'/'}));
+function moreGames(noBtn){
+  let list=(window.SMAISLE&&Array.isArray(window.SMAISLE.games))?window.SMAISLE.games.filter(g=>g.daily&&g.url&&g.icon):MORE_FALLBACK;
+  list=list.filter(g=>g.id!=='jx').slice(0,6);
+  return `<div class="more">${noBtn?'':'<button class="go hi" id="resDaily" style="text-transform:none">‹ smAisle Daily</button>'}
+    <div class="more-h">More smAisle games</div><div class="more-row">${list.map(g=>`<a href="${g.url}" title="${g.name}"><img src="${g.icon}" alt="" onerror="this.style.visibility='hidden'"><span>${g.name}</span></a>`).join('')}</div></div>`;
+}
 function goDaily(){location.href='https://smaisle.app/daily/'}
 function finish(lost){
   if(!lost){G.c=CARDS-1;G.done=true;save()}
@@ -495,11 +510,12 @@ function drawResult(){
   ${bonusBlock()}
   ${PRACTICE?'':'<button class="go hi" id="shareBtn">Share result</button>'}
   <button class="go ${PRACTICE?'hi':'alt'}" id="practBtn">Practice another theme</button>
+  ${moreGames()}
   ${PAST?`<button class="go alt" id="backToday">Back to today</button>`:`<div class="small">Next game in <div class="countdown" id="cd"></div></div>`}
   <div class="small"><button class="link" id="rArch">Archive</button> · <button class="link" id="rStats">Stats</button></div>
   <h3 style="font:800 12px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin:18px 0 6px">${PAST?'The':'Today’s'} words</h3>
   <div style="text-align:left;margin-bottom:20px">${TH[1].map(([w,d],i)=>{const r=G.res[i];return `<div class="wl ${r==='W'?'w':r==='L'?'l':''}"><b>${cap(w)}</b>${r==='L'&&G.bad?` <span style="font:700 12px var(--sans);color:var(--red)">you typed “${G.bad}” for letter ${G.k+1}</span>`:''}<div>${d}.</div></div>`}).join('')}</div>`;
-  if($('shareBtn'))$('shareBtn').onclick=share;if($('bonusBtn'))$('bonusBtn').onclick=bonusIntro;$('practBtn').onclick=practice;$('rArch').onclick=showArchive;$('rStats').onclick=showStats;
+  if($('shareBtn'))$('shareBtn').onclick=share;if($('resDaily'))$('resDaily').onclick=goDaily;if($('bonusBtn'))$('bonusBtn').onclick=bonusIntro;$('practBtn').onclick=practice;$('rArch').onclick=showArchive;$('rStats').onclick=showStats;
   if(PAST)$('backToday').onclick=()=>{load(today());draw();checkIn('open',true)};
   tick();
 }
