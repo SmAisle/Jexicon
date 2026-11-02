@@ -9,3 +9,6 @@ A daily definition spelling game by smAisle. Read the definition, then spell the
 
 ## v2.2 (Nov 2)
 - Cleaner menu (change list #21): Dark mode and Sound moved to a new Settings screen.
+
+## v2.3 (Nov 2)
+- Finish screen standard: smAisle Daily button and More smAisle games row (results and the Plus gate). Usage check-in adds code, the invite code for the By code table on the stats page (change list #10). Replaces PR #3.
