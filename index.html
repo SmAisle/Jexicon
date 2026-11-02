@@ -157,6 +157,21 @@ body.oncover #dailyBar,body.oncover #top,body.oncover #pastTag,body.oncover #the
 #cover .daily i{font:italic 14px var(--body);color:var(--ink2)}
 #cover .ver{font:600 12px var(--sans);color:var(--fade);margin-top:14px}
 @media (max-height:620px){#cover h1{font-size:52px}#cover{padding-top:8px}}
+/* How to Play: one screen on an iPhone, with a looping demo of two turns */
+.help h2{margin-bottom:8px}
+.help ul{margin:10px 0 6px;padding-left:18px}.help li{font:14.5px/1.42 var(--body);margin:3px 0}
+.help .hsmall{font:600 12px/1.4 var(--sans);color:var(--ink2);margin:6px 0 0}.help a{color:var(--ink)}
+.help .go{margin-top:10px;padding:12px}
+.demo{background:var(--card);border:2px solid var(--line);box-shadow:4px 4px 0 var(--shadow);padding:10px 12px 8px;margin-right:4px}
+.dm-meta{display:flex;justify-content:space-between;align-items:center;font:700 10.5px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--fade)}
+.dm-meta .len{background:var(--hi);color:var(--hi-ink);border:2px solid var(--line);padding:1px 6px;font-size:11px}
+.dm-def{font:15px/1.35 var(--body);margin:6px 0 8px;min-height:20px}
+.dm-boxes{display:flex;justify-content:center;gap:5px;min-height:38px}
+.dm-boxes .box{--bw:30px}
+.dm-note{text-align:center;font:800 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;margin-top:5px;min-height:16px}
+.dm-note.ok{color:var(--green)} .dm-note.bad{color:var(--red)}
+@media (max-height:600px){.help li{font-size:12.5px!important;line-height:1.35}.help ul{margin:6px 0 4px}.dm-boxes .box{--bw:24px}.dm-boxes{min-height:30px}.help .go{padding:9px;margin-top:6px}.demo{padding:7px 10px 5px}}
+@media (max-height:700px){.help li{font-size:13.5px;margin:2px 0}.help h2{font-size:22px}.dm-def{font-size:14px}.sheet>.box2.help{padding:14px 14px 12px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -192,20 +207,22 @@ body.oncover #dailyBar,body.oncover #top,body.oncover #pastTag,body.oncover #the
   <div class="ver" id="menuVer"></div>
 </div></div>
 
-<div class="sheet" id="sHelp" hidden><div class="box2">
+<div class="sheet" id="sHelp" hidden><div class="box2 help">
   <button class="x" data-close>×</button><h2>How to Play</h2>
-  <p>Every day there's a new theme and 5 cards. Each card shows the definition of a word that fits the theme.</p>
+  <div class="demo" aria-hidden="true">
+    <div class="dm-meta"><span id="dmCard">Card 1</span><span class="len" id="dmLen">3 letters</span></div>
+    <div class="dm-def" id="dmDef">A small furry pet that purrs.</div>
+    <div class="dm-boxes" id="dmBoxes"></div>
+    <div class="dm-note" id="dmNote">&nbsp;</div>
+  </div>
   <ul>
-    <li>Read the definition, then tap <b>Spell it</b>.</li>
-    <li>Type the word <b>one letter at a time</b>. The card tells you how many letters it has.</li>
-    <li>Every right letter turns green. Spell the whole word to pass the card and move on to the next one.</li>
-    <li><b>One wrong letter and the game is over.</b> No take-backs.</li>
-    <li>Answers are always the full word, never a short form: <i>refrigerator</i>, not <i>fridge</i>.</li>
-    <li>The cards get harder as you go. Pass all 5 for a perfect day.</li>
-    <li><b>⚡ Bonus round:</b> after the 5 cards, try one more word against a 20-second clock.</li>
+    <li>Each day: a theme and <b>5 cards</b>, easy to hard.</li>
+    <li>Read the definition, tap <b>Spell it</b>, and type the word <b>one letter at a time</b>.</li>
+    <li>Right letters turn green. <b>One wrong letter and you’re out.</b></li>
+    <li>Pass all 5, then try the <b>⚡ bonus</b>: one more word in 20 seconds.</li>
+    <li>Always the full word: <i>refrigerator</i>, not <i>fridge</i>.</li>
   </ul>
-  <p>A new game comes out every day at midnight Eastern time. Past days are in the <b>Archive</b>. Want more? <b>Practice</b> (in the menu) lets you play other themes. Practice games aren’t counted.</p>
-  <p class="small" id="termsLine">By playing, you agree to the smAisle <a href="https://smaisle.app/about.html" target="_blank" rel="noopener">Terms and Privacy</a>. The game counts opens and plays anonymously to see how many people play. No names, no accounts.</p>
+  <p class="hsmall">New game at midnight Eastern. Past days are in the Archive. <span id="termsLine">By playing, you agree to the smAisle <a href="https://smaisle.app/about.html" target="_blank" rel="noopener">Terms and Privacy</a>. Opens and plays are counted anonymously.</span></p>
   <button class="go" data-close id="helpGo">Play</button>
 </div></div>
 
@@ -224,7 +241,7 @@ body.oncover #dailyBar,body.oncover #top,body.oncover #pastTag,body.oncover #the
 
 <script>
 /* ---------- Version (bump on every change; keep the Claude link and GitHub copies the same) ---------- */
-const VERSION='1.9',VDATE='Nov 2',GAME='jx';
+const VERSION='2.0',VDATE='Nov 2',GAME='jx';
 
 /* ---------- Daily themes. Day 1 is Nov 2, 2026; each day uses the next theme (cycles when the list runs out).
    Five words per day, easiest first. Every word is a noun, and the boxes show its length. ---------- */
@@ -444,6 +461,20 @@ function showCover(){
   if(!pv){$('cvArch').onclick=showArchive;$('cvPract').onclick=()=>{hideCover();practice()}}
 }
 function hideCover(){document.body.classList.remove('oncover');$('cover').hidden=true;draw()}
+/* How to Play demo: a right answer (CAT), then a miss (DOG, typed D-O-T), on a loop while the sheet is open */
+const DEMO=[{w:'CAT',def:'A small furry pet that purrs.',typed:'CAT'},{w:'DOG',def:'A loyal pet that barks and fetches.',typed:'DOT'}];
+let demoT=null;
+function demoRun(i,step){
+  clearTimeout(demoT);if($('sHelp').hidden)return;const d=DEMO[i],n=step;
+  $('dmCard').textContent='Card '+(i+1);$('dmLen').textContent=d.w.length+' letters';$('dmDef').textContent=d.def;
+  let h='',note='&nbsp;',cls='';
+  for(let k=0;k<d.w.length;k++){
+    if(k<n){const c=d.typed[k],ok=c===d.w[k];h+=`<div class="box ${ok?'ok':'bad'}">${c}</div>`;if(!ok){note='Wrong letter: you’re out!';cls='bad';break}}
+    else h+=`<div class="box${k===n?' cur':''}"></div>`}
+  if(n>=d.w.length&&d.typed===d.w){note='✓ Spelled! On to the next card';cls='ok'}
+  $('dmBoxes').innerHTML=h;const e=$('dmNote');e.innerHTML=note;e.className='dm-note '+cls;
+  const done=cls!=='';demoT=setTimeout(()=>done?demoRun((i+1)%DEMO.length,0):demoRun(i,n+1),done?1800:(n===0?1100:650));
+}
 function goDaily(){location.href='https://smaisle.app/daily/'}
 function finish(lost){
   if(!lost){G.c=CARDS-1;G.done=true;save()}
@@ -513,7 +544,7 @@ function showArchive(){
 }
 
 /* ---------- Sheets and menu ---------- */
-function only(id){closeSheets();closeSpell();$(id).hidden=false}
+function only(id){closeSheets();closeSpell();$(id).hidden=false;if(id==='sHelp')demoRun(0,0)}
 function closeSheets(){document.querySelectorAll('.sheet').forEach(s=>s.hidden=true)}
 document.querySelectorAll('.sheet').forEach(s=>{s.addEventListener('click',e=>{if(e.target===s||e.target.closest('[data-close]'))s.hidden=true})});
 $('menuBtn').onclick=()=>only('sMenu');
