@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>/* smAisle look: Dark mode Off / On / Match phone, shared key "smaisle-dark" on smaisle.app. Set before drawing so there's no flash. */
+(function(){var m='off';try{m=localStorage.getItem('smaisle-dark')||'off'}catch(e){}
+var dark=m==='on'||(m==='auto'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);
+if(dark)document.documentElement.setAttribute('data-mode','navy')})();</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Jexicon</title>
+<meta name="description" content="A daily spelling game. Read the definition, then spell the word one letter at a time. One wrong letter and it's over.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Jexicon">
+<meta name="theme-color" content="#f4efe1">
+<link rel="icon" href="icon-180.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,700&family=Libre+Baskerville:ital@0;1&family=Libre+Franklin:wght@500;600;700;800&display=swap">
+<style>
+:root{
+  --paper:#f4efe1;--paper2:#ebe4d0;--ink:#1a1814;--ink2:#4a453b;--fade:#8c8574;--card:#fffdf6;--red:#b3261e;--green:#2f7d3a;
+  --hi:#ffe27a;--hi-ink:#1a1814;--line:#1a1814;--btn:#1a1814;--btn-ink:#f4efe1;--key:#fffdf6;--shadow:#1a1814;
+  --head:"Playfair Display",Georgia,"Times New Roman",serif;--body:"Libre Baskerville",Georgia,serif;--sans:"Libre Franklin","Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+:root[data-mode="navy"]{--paper:#121b2e;--paper2:#0d1424;--card:#1c2a44;--ink:#efe6cc;--ink2:#c9b98f;--fade:#8792ab;--line:#3a4a6b;--btn:#c9a961;--btn-ink:#121b2e;
+  --hi:#ffe27a;--hi-ink:#121b2e;--red:#e0402f;--green:#4caf63;--key:#24355a;--shadow:#05080f;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;touch-action:manipulation;-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;overscroll-behavior:none}
+button{font:inherit;color:inherit;touch-action:manipulation;cursor:pointer}
+#app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding:env(safe-area-inset-top) 16px calc(env(safe-area-inset-bottom) + 10px)}
+#dailyBar{display:inline-block;align-self:flex-start;margin:10px 0 2px;padding:7px 14px;background:var(--hi);color:var(--hi-ink);border:2px solid var(--line);border-radius:10px;box-shadow:2px 2px 0 var(--shadow);font:800 14px var(--sans);text-decoration:none}
+/* top bar */
+#top{display:flex;align-items:center;justify-content:space-between;padding:10px 0 8px;border-bottom:3px double var(--line)}
+#top .no{font:700 12px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);min-width:70px}
+#top h1{margin:0;font:900 30px/1 var(--head);letter-spacing:-.01em}
+#menuBtn{min-width:70px;text-align:right;background:none;border:0;padding:6px 0;font-size:24px;line-height:1}
+#theme{display:flex;justify-content:center;align-items:center;gap:8px;margin:12px 0 6px;font:700 12px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
+#theme b{background:var(--hi);color:var(--hi-ink);padding:3px 8px;letter-spacing:.1em}
+#pips{display:flex;justify-content:center;gap:8px;margin:6px 0 12px}
+.pip{width:34px;height:44px;border:2px solid var(--line);background:var(--card);display:grid;place-items:center;font:800 14px var(--sans);color:var(--fade)}
+.pip.now{border-color:var(--ink);box-shadow:3px 3px 0 var(--shadow);color:var(--ink);transform:translateY(-2px)}
+.pip.lock{font-size:13px;opacity:.6}
+.gate{margin:18px 0 0;padding:16px;border:2px solid var(--line);background:var(--card);box-shadow:4px 4px 0 var(--shadow);text-align:center}
+.gate .star{display:inline-block;background:var(--hi);color:var(--hi-ink);border:2px solid var(--line);font:800 12px var(--sans);letter-spacing:.08em;padding:2px 8px}
+.gate h2{font:900 23px/1.2 var(--head);margin:10px 0 6px}.gate p{font:15px/1.5 var(--body);color:var(--ink2);margin:0}
+.pip.w{background:var(--green);border-color:var(--green);color:#fff}
+.pip.l{background:var(--red);border-color:var(--red);color:#fff}
+/* the definition card */
+#stage{flex:1;display:flex;flex-direction:column;justify-content:flex-start}
+.dcard{position:relative;background:var(--card);border:2px solid var(--line);box-shadow:6px 6px 0 var(--shadow);padding:18px 18px 16px;margin:4px 6px 0 0;animation:deal .35s ease-out}
+@keyframes deal{from{transform:translateX(40px) rotate(3deg);opacity:0}to{transform:none;opacity:1}}
+.dcard .meta{display:flex;justify-content:space-between;font:700 11px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--fade);margin-bottom:12px}
+.dcard .meta{align-items:center}.dcard .meta .len{background:var(--hi);color:var(--hi-ink);border:2px solid var(--line);font:800 16px var(--sans);letter-spacing:.06em;padding:4px 10px;box-shadow:2px 2px 0 var(--shadow)}
+.dcard .word{font:900 28px/1.1 var(--head);margin:0 0 4px;min-height:31px;letter-spacing:.02em}
+.dcard .word .q{color:var(--fade);letter-spacing:.15em}
+.dcard .pos{font:italic 14px var(--body);color:var(--ink2);margin-bottom:12px}
+.dcard .def{font:17.5px/1.55 var(--body);margin:0;padding-left:26px;position:relative}
+.dcard .def::before{content:"1.";position:absolute;left:0;top:0;font:700 15px/1.75 var(--sans);color:var(--ink2)}
+.dcard.ok{border-color:var(--green)} .dcard.bad{border-color:var(--red)}
+.stamp{position:absolute;right:14px;top:62px;font:800 13px var(--sans);letter-spacing:.12em;text-transform:uppercase;padding:4px 8px;border:2.5px solid currentColor;transform:rotate(-8deg)}
+.stamp.ok{color:var(--green)} .stamp.bad{color:var(--red)}
+.go{display:block;width:100%;margin:16px 0 0;padding:14px;border:2px solid var(--line);background:var(--btn);color:var(--btn-ink);font:800 16px var(--sans);letter-spacing:.04em;text-transform:uppercase;box-shadow:4px 4px 0 var(--shadow)}
+.go:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--shadow)}
+.go.alt{background:var(--card);color:var(--ink)}
+.go.bonus{background:var(--btn);color:var(--btn-ink);border-color:var(--line)}
+.bres{margin:16px 0 0;padding:12px 14px;border:2px solid var(--line);background:var(--card);font:700 15px var(--sans);text-align:center}
+.bres.w{border-color:var(--green)} .bres.l{border-color:var(--red)} .bres b{font:900 18px var(--head)}
+.clock{position:relative;height:34px;border:2px solid var(--line);background:var(--paper2);margin:4px 0 12px;overflow:hidden}
+.clock i{position:absolute;left:0;top:0;bottom:0;background:var(--hi);transition:width .1s linear}
+.clock i.low{background:var(--red)}
+.clock b{position:relative;display:block;text-align:center;font:800 20px/30px var(--sans);font-variant-numeric:tabular-nums} .go.hi{background:var(--hi);color:var(--hi-ink)}
+.small{font:600 13px var(--sans);color:var(--ink2);text-align:center;margin-top:12px}
+.link{background:none;border:0;text-decoration:underline;font:600 13px var(--sans);color:var(--ink2);padding:6px}
+/* spelling panel: pops up from the bottom */
+#spell{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--paper2);border-top:3px solid var(--line);padding:12px 8px calc(env(safe-area-inset-bottom) + 10px);transform:translateY(105%);transition:transform .28s ease-out}
+#spell.up{transform:none}
+#spell .wrap{max-width:520px;margin:0 auto}
+#spell .hd{display:flex;justify-content:space-between;align-items:center;font:700 12px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin:0 6px 10px}
+#spell .hd button{background:none;border:0;font:700 12px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);padding:4px}
+#boxes{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;margin:0 0 14px}
+.box{width:var(--bw,38px);height:calc(var(--bw,38px) * 1.2);border:2px solid var(--line);background:var(--card);display:grid;place-items:center;font:900 calc(var(--bw,38px) * .62) var(--head);text-transform:uppercase}
+.box.cur{border-color:var(--ink);box-shadow:0 3px 0 var(--ink);animation:blink 1s infinite}
+@keyframes blink{50%{background:var(--hi);}}
+.box.ok{background:var(--green);border-color:var(--green);color:#fff}.box.ok.new{animation:pop .18s}
+.box.bad{background:var(--red);border-color:var(--red);color:#fff;animation:shake .4s}
+.box.rev{color:var(--red)}
+@keyframes pop{50%{transform:scale(1.15)}}
+@keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+#kb .row{display:flex;justify-content:center;gap:5px;margin-bottom:6px}
+#kb button{flex:1;max-width:44px;height:50px;border:1.5px solid var(--line);border-radius:5px;background:var(--key);font:700 18px var(--sans);padding:0;box-shadow:0 2px 0 var(--line)}
+#kb button:active{transform:translateY(2px);box-shadow:none;background:var(--hi);color:var(--hi-ink)}
+/* sheets */
+.sheet{position:fixed;inset:0;z-index:10;background:rgba(26,24,20,.45);display:flex;align-items:flex-end;justify-content:center;padding:16px}
+:root[data-mode="navy"] .sheet{background:rgba(5,8,15,.75)}
+.sheet>.box2{width:100%;max-width:480px;max-height:calc(100% - 20px);overflow:auto;background:var(--paper);border:2px solid var(--line);box-shadow:6px 6px 0 var(--shadow);padding:18px 18px 16px;margin-bottom:env(safe-area-inset-bottom);-webkit-user-select:text;user-select:text}
+@media (min-height:640px){.sheet{align-items:center}}
+.sheet h2{margin:0 0 4px;font:900 26px var(--head)} .sheet h3{margin:16px 0 6px;font:800 13px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.sheet p,.sheet li{font:15px/1.55 var(--body)} .sheet ul{padding-left:20px;margin:6px 0}
+.x{float:right;background:none;border:0;font:700 24px/1 var(--sans);padding:0 2px;color:var(--ink2)}
+.mbtn{display:block;width:100%;text-align:left;margin:8px 0;padding:13px 14px;border:2px solid var(--line);background:var(--card);font:800 15px var(--sans);letter-spacing:.03em}
+.mbtn.y{background:var(--hi);color:var(--hi-ink)}
+.seg{display:flex;border:2px solid var(--line);margin:6px 0 10px}
+.seg button{flex:1;padding:9px 4px;border:0;background:var(--card);font:700 13px var(--sans)}
+.seg button+button{border-left:2px solid var(--line)}
+.seg button.on{background:var(--btn);color:var(--btn-ink)}
+.ver{font:600 12px var(--sans);color:var(--fade);text-align:center;margin-top:14px}
+.statrow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;margin:10px 0}
+.statrow b{display:block;font:900 30px var(--head)} .statrow span{font:600 11px var(--sans);color:var(--ink2);text-transform:uppercase;letter-spacing:.05em}
+.bar{display:flex;align-items:center;gap:8px;margin:4px 0;font:700 13px var(--sans)}
+.bar i{display:block;height:20px;background:var(--fade);min-width:22px;color:#fff;font-style:normal;text-align:right;padding:2px 6px;font-size:12px}
+.bar i.me{background:var(--green)}
+.arch{display:flex;justify-content:space-between;align-items:center;width:100%;padding:11px 12px;margin:6px 0;border:2px solid var(--line);background:var(--card);font:700 14px var(--sans);text-align:left}
+.arch small{display:block;font:600 12px var(--sans);color:var(--fade);margin-top:2px}
+.arch .r{font:800 14px var(--sans);white-space:nowrap}
+.wl{margin:6px 0;padding:8px 10px;border-left:4px solid var(--fade);background:var(--card)}
+.wl b{font:900 17px var(--head);letter-spacing:.03em} .wl div{font:13.5px/1.45 var(--body);color:var(--ink2)}
+.wl.w{border-color:var(--green)} .wl.l{border-color:var(--red)}
+/* results */
+#result{text-align:center}
+#result .big{font:900 64px/1 var(--head);margin:14px 0 2px}
+#result .sq{font-size:26px;letter-spacing:4px;margin:6px 0}
+#result .msg{font:italic 17px var(--body);color:var(--ink2);margin:4px 0 12px}
+.countdown{font:800 22px var(--sans);font-variant-numeric:tabular-nums}
+#toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 70px);transform:translateX(-50%);z-index:20;background:var(--btn);color:var(--btn-ink);font:700 14px var(--sans);padding:10px 16px;border:2px solid var(--line);opacity:0;transition:opacity .2s;pointer-events:none}
+#toast.on{opacity:1}
+#pastTag{background:var(--ink);color:var(--paper);font:800 11px var(--sans);letter-spacing:.1em;text-transform:uppercase;text-align:center;padding:5px;margin-top:8px}
+@media (max-height:680px){.dcard .def{font-size:16px}#kb button{height:44px}.pip{height:38px;width:30px}#top h1{font-size:26px}}
+/* While the keyboard is up, squeeze everything above it so the whole definition stays visible on small phones */
+body.typing #dailyBar,body.typing #pips,body.typing #stage>.go,body.typing #stage>.small,body.typing #stage>.link{display:none!important}
+body.typing #top{padding:6px 0 5px} body.typing #top h1{font-size:24px}
+body.typing #theme{margin:7px 0 8px} body.typing #pastTag{margin-top:4px;padding:3px}
+body.typing .dcard{padding:12px 14px 12px;margin-top:0;animation:none}
+body.typing .dcard .meta{margin-bottom:6px} body.typing .dcard .meta .len{font-size:14px;padding:2px 8px}
+body.typing .dcard .word{font-size:24px;min-height:26px} body.typing .dcard .pos{margin-bottom:6px;font-size:13px}
+body.typing .dcard .def{font-size:16px;line-height:1.45} body.typing .clock{height:28px;margin:2px 0 8px} body.typing .clock b{font-size:17px;line-height:24px}
+@media (max-height:720px){#spell{padding-top:8px}#spell .hd{margin-bottom:6px}#boxes{margin-bottom:9px}#kb .row{margin-bottom:5px}#kb button{height:44px}}
+@media (max-height:620px){#kb button{height:38px;font-size:16px}body.typing .dcard .def{font-size:15px}body.typing #theme{display:none}}
+/* Home screen (cover), in the style of the other smAisle Daily games */
+body.oncover #dailyBar,body.oncover #top,body.oncover #pastTag,body.oncover #theme,body.oncover #pips,body.oncover #stage{display:none!important}
+#cover{flex:1;display:flex;flex-direction:column;justify-content:center;padding:20px 0 24px;text-align:center}
+#cover .rule{border-top:3px double var(--line);height:0;margin:0}
+#cover h1{font:900 64px/1 var(--head);margin:14px 0 12px;letter-spacing:-.01em}
+#cover .tag{font:italic 17px/1.45 var(--body);color:var(--ink2);margin:14px 6px 4px}
+#cover .date{font:700 12px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin:14px 0 8px}
+#cover .date b{background:var(--hi);color:var(--hi-ink);padding:2px 7px}
+#cover .play{display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:16px;border:2px solid var(--line);background:var(--card);box-shadow:4px 4px 0 var(--shadow);margin:6px 0 4px}
+#cover .play .t{font:900 26px/1.1 var(--head)} #cover .play .s{display:inline-block;margin-top:6px;background:var(--hi);color:var(--hi-ink);font:800 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;padding:2px 6px}
+#cover .play .go2{font:800 14px var(--sans);letter-spacing:.06em;text-transform:uppercase;text-align:right;white-space:nowrap}
+#cover .play .go2 small{display:block;font:700 11px var(--sans);color:var(--fade);letter-spacing:.06em}
+#cover .links{margin:16px 0 4px;font:800 13px var(--sans);letter-spacing:.06em;text-transform:uppercase}
+#cover .links button{background:none;border:0;padding:6px 4px;text-decoration:underline;text-underline-offset:3px;font:inherit;letter-spacing:inherit}
+#cover .daily{display:flex;justify-content:center;align-items:center;gap:8px;border-top:2px solid var(--line);margin-top:16px;padding-top:14px;font:800 14px var(--sans);background:none;border-left:0;border-right:0;border-bottom:0;width:100%}
+#cover .daily i{font:italic 14px var(--body);color:var(--ink2)}
+#cover .ver{font:600 12px var(--sans);color:var(--fade);margin-top:14px}
+@media (max-height:620px){#cover h1{font-size:52px}#cover{padding-top:8px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app">
+  <a id="dailyBar" href="https://smaisle.app/daily/">‹ smAisle Daily</a>
+  <div id="top"><span class="no" id="noLbl">No. 1</span><h1>Jexicon</h1><button id="menuBtn" aria-label="Menu">☰</button></div>
+  <div id="cover" hidden></div>
+  <div id="pastTag" hidden></div>
+  <div id="theme">Today's theme <b id="themeName">Office</b></div>
+  <div id="pips"></div>
+  <div id="stage"></div>
+</div>
+
+<div id="spell" aria-hidden="true"><div class="wrap">
+  <div class="hd"><span id="spellHd">Spell it, one letter at a time</span><button id="hideSpell">Hide ▾</button></div>
+  <div id="boxes"></div>
+  <div id="kb"></div>
+</div></div>
+
+<div class="sheet" id="sMenu" hidden><div class="box2">
+  <button class="x" data-close>×</button><h2>Menu</h2>
+  <button class="mbtn" id="mHome">Jexicon home</button>
+  <button class="mbtn" id="mHelp">How to Play</button>
+  <button class="mbtn" id="mArch">Archive</button>
+  <button class="mbtn" id="mStats">Stats</button>
+  <button class="mbtn" id="mPract">Practice</button>
+  <button class="mbtn y" id="mDaily">‹ smAisle Daily</button>
+  <h3>Dark mode</h3>
+  <div class="seg" id="dmSeg"><button data-m="off">Off</button><button data-m="on">On</button><button data-m="auto">Match phone</button></div>
+  <h3>Sound</h3>
+  <div class="seg" id="sndSeg"><button data-s="on">On</button><button data-s="off">Off</button></div>
+  <div class="ver" id="menuVer"></div>
+</div></div>
+
+<div class="sheet" id="sHelp" hidden><div class="box2">
+  <button class="x" data-close>×</button><h2>How to Play</h2>
+  <p>Every day there's a new theme and 5 cards. Each card shows the definition of a word that fits the theme.</p>
+  <ul>
+    <li>Read the definition, then tap <b>Spell it</b>.</li>
+    <li>Type the word <b>one letter at a time</b>. The card tells you how many letters it has.</li>
+    <li>Every right letter turns green. Spell the whole word to pass the card and move on to the next one.</li>
+    <li><b>One wrong letter and the game is over.</b> No take-backs.</li>
+    <li>Answers are always the full word, never a short form: <i>refrigerator</i>, not <i>fridge</i>.</li>
+    <li>The cards get harder as you go. Pass all 5 for a perfect day.</li>
+    <li><b>⚡ Bonus round:</b> after the 5 cards, try one more word against a 20-second clock.</li>
+  </ul>
+  <p>A new game comes out every day at midnight Eastern time. Past days are in the <b>Archive</b>. Want more? <b>Practice</b> (in the menu) lets you play other themes. Practice games aren’t counted.</p>
+  <p class="small" id="termsLine">By playing, you agree to the smAisle <a href="https://smaisle.app/about.html" target="_blank" rel="noopener">Terms and Privacy</a>. The game counts opens and plays anonymously to see how many people play. No names, no accounts.</p>
+  <button class="go" data-close id="helpGo">Play</button>
+</div></div>
+
+<div class="sheet" id="sStats" hidden><div class="box2">
+  <button class="x" data-close>×</button><h2>Stats</h2>
+  <div id="statsBody"></div>
+</div></div>
+
+<div class="sheet" id="sArch" hidden><div class="box2">
+  <button class="x" data-close>×</button><h2>Archive</h2>
+  <p class="small" style="text-align:left;margin-top:0">Play any past day. Archive games don't change your streak.</p>
+  <div id="archBody"></div>
+</div></div>
+
+<div id="toast"></div>
+
+<script>
+/* ---------- Version (bump on every change; keep the Claude link and GitHub copies the same) ---------- */
+const VERSION='1.9',VDATE='Nov 2',GAME='jx';
+
+/* ---------- Daily themes. Day 1 is Nov 2, 2026; each day uses the next theme (cycles when the list runs out).
+   Five words per day, easiest first. Every word is a noun, and the boxes show its length. ---------- */
+const THEMES=[
+ ["Office", [["DESK", "A table with drawers where you sit to work"], ["STAPLER", "A hand tool that joins sheets of paper by pushing a thin metal clip through them"], ["CALENDAR", "A chart of the days, weeks and months of the year, used to plan meetings"], ["RECEPTIONIST", "The person at the front desk who greets visitors and answers the phone"], ["STATIONERY", "Writing paper, envelopes and similar supplies"]], ["SHREDDER", "A machine that cuts documents into thin strips so no one can read them"]],
+ ["Kitchen", [["OVEN", "The closed, heated box under the stovetop where you bake cakes and roast turkeys"], ["WHISK", "A wire utensil for beating eggs or cream"], ["TOASTER", "An appliance with slots that browns slices of bread"], ["SPATULA", "A flat, wide utensil for flipping pancakes or burgers"], ["REFRIGERATOR", "The large kitchen appliance that keeps food cold"]], ["BLENDER", "An appliance with spinning blades in a tall jar that turns fruit into smoothies"]],
+ ["Weather", [["FOG", "Thick, low cloud that rolls in off the water; San Francisco is famous for it"], ["THUNDER", "The loud rumbling sound that follows lightning"], ["HUMIDITY", "The amount of moisture in the air"], ["HURRICANE", "A violent Atlantic storm with very strong winds, called a typhoon in the Pacific"], ["BAROMETER", "An instrument that measures air pressure to help forecast the weather"]], ["TORNADO", "A spinning, funnel-shaped column of wind that touches the ground; also called a twister"]],
+ ["Animals", [["ZEBRA", "An African animal like a horse, with black and white stripes"], ["GIRAFFE", "The tallest animal, with a very long neck"], ["KANGAROO", "An Australian animal that hops and carries its baby in a pouch"], ["CHAMELEON", "A lizard that can change the color of its skin"], ["RHINOCEROS", "A large, thick-skinned animal with one or two horns on its nose"]], ["HIPPOPOTAMUS", "A huge African animal that spends its days in rivers; its name means river horse"]],
+ ["Music", [["DRUM", "An instrument you hit with sticks, made of skin stretched over a hollow frame"], ["GUITAR", "A stringed instrument, usually with six strings, that you strum or pluck"], ["RHYTHM", "The pattern of strong and weak beats in music; famous for being spelled without a regular vowel"], ["SAXOPHONE", "A curved brass instrument with a reed, often heard in jazz"], ["ORCHESTRA", "A large group of musicians playing strings, woodwinds, brass and percussion together"]], ["TAMBOURINE", "A small hand drum with jingling metal disks around the rim"]],
+ ["Sports", [["GOAL", "What you score in soccer or hockey when the ball or puck goes into the net"], ["REFEREE", "The official who enforces the rules in a game like soccer or basketball"], ["MARATHON", "A running race of about 26.2 miles"], ["GYMNASTICS", "A sport of flips, balance beams and floor routines"], ["LACROSSE", "A team sport played with sticks that have a small net on the end"]], ["VOLLEYBALL", "A team sport where players hit a ball back and forth over a high net with their hands"]],
+ ["The body", [["ELBOW", "The joint in the middle of your arm"], ["EYEBROW", "The strip of hair above each eye"], ["STOMACH", "The organ where food goes after you swallow it"], ["SKELETON", "All the bones of the body together"], ["DIAPHRAGM", "The dome-shaped muscle under the lungs that helps you breathe"]], ["KNUCKLE", "A joint where a finger bends; the bump you rap on a door with"]],
+ ["Beach", [["WAVE", "A moving ridge of water that rolls onto the shore"], ["SANDCASTLE", "A tower of wet sand built at the beach, sometimes with a moat"], ["LIFEGUARD", "The person who watches swimmers and rescues anyone in trouble"], ["SURFBOARD", "A long, narrow board you stand on to ride waves"], ["BOARDWALK", "A wooden walkway along a beach"]], ["SUNGLASSES", "Dark lenses you wear to protect your eyes from bright light"]],
+ ["School", [["PENCIL", "A wooden writing tool with graphite inside"], ["ERASER", "A rubber block that rubs out pencil marks"], ["LIBRARY", "A room or building full of books you can borrow"], ["PRINCIPAL", "The person in charge of a school"], ["CAFETERIA", "The school’s self-serve dining room, named from a Spanish word for coffee shop"]], ["DICTIONARY", "A book that lists words in alphabetical order with their meanings"]],
+ ["Space", [["MOON", "The natural satellite that circles the Earth"], ["COMET", "An icy object with a glowing tail that travels around the sun"], ["ASTRONAUT", "A NASA crew member trained to travel into space"], ["TELESCOPE", "An instrument that makes faraway things like stars look closer"], ["ATMOSPHERE", "The layer of gases that surrounds a planet"]], ["GALAXY", "A huge system of billions of stars, like the Milky Way"]],
+ ["Restaurant", [["TIP", "Extra money you leave for good service; the short word, not gratuity"], ["MENU", "The list of dishes you can order"], ["DESSERT", "The sweet course at the end of a meal"], ["APPETIZER", "A small dish served before the main course, called a starter in Britain"], ["RESERVATION", "What you make when you call ahead to hold a table for dinner"]], ["NAPKIN", "A cloth or paper square for wiping your mouth and hands"]],
+ ["Camping", [["TENT", "A fabric shelter held up by poles"], ["LANTERN", "A portable light with a handle, often hung inside a tent"], ["COMPASS", "A tool with a needle that always points north"], ["CAMPFIRE", "An outdoor fire at a campsite, for warmth, cooking and telling stories"], ["MARSHMALLOW", "A soft, puffy white candy you toast on a stick"]], ["HAMMOCK", "A hanging bed of net or cloth strung between two trees"]],
+ ["Garden", [["SEED", "The small part of a plant that grows into a new plant"], ["RAKE", "A tool with teeth on a long handle for gathering leaves"], ["SCARECROW", "A dressed-up figure set in a field to frighten birds away"], ["FERTILIZER", "Store-bought plant food, with three numbers on the bag, spread to help plants grow"], ["WHEELBARROW", "A one-wheeled cart with handles for moving soil or stones"]], ["GREENHOUSE", "A glass building where plants are grown"]],
+ ["Travel", [["MAP", "A drawing of an area that shows roads and places"], ["PASSPORT", "The official booklet you show to cross international borders"], ["SOUVENIR", "Something you buy on a trip to remember the place by"], ["DESTINATION", "The place you are traveling to"], ["ITINERARY", "A detailed plan of a trip, with times and places"]], ["CUSTOMS", "The airport checkpoint where officers check what you bring into a country"]],
+ ["Hospital", [["NURSE", "A trained person who cares for patients and helps doctors"], ["BANDAGE", "A strip of material for covering a wound"], ["AMBULANCE", "A vehicle that rushes sick or injured people to the hospital"], ["THERMOMETER", "An instrument that measures temperature"], ["STETHOSCOPE", "The tool a doctor uses to listen to your heart"]], ["STRETCHER", "A frame with handles for carrying a patient who can’t walk; also called a gurney"]],
+ ["Ocean", [["CRAB", "A sea creature with a hard shell and pincers that walks sideways"], ["DOLPHIN", "A smart, playful sea mammal known for clicks and leaps; Flipper was one"], ["OCTOPUS", "A sea creature with eight arms"], ["JELLYFISH", "A see-through sea creature with stinging tentacles"], ["SUBMARINE", "A ship that can travel underwater"]], ["SEAHORSE", "A small fish that swims upright, with a head shaped like a horse"]],
+ ["Farm", [["BARN", "A large farm building for animals, hay and equipment"], ["ROOSTER", "A male chicken that crows at dawn"], ["TRACTOR", "A powerful vehicle that pulls farm machinery"], ["ORCHARD", "A field of fruit trees"], ["PITCHFORK", "A tool with long prongs on a handle for lifting hay"]], ["HAYSTACK", "A large pile of dried grass; finding a needle in one is hard"]],
+ ["Money", [["COIN", "A small, flat, round piece of metal money"], ["WALLET", "A small folding case for cash and cards, carried in a pocket"], ["BUDGET", "A plan for how you will spend your money"], ["RECEIPT", "The slip of paper you get that shows what you bought"], ["MORTGAGE", "A loan used to buy a house"]], ["ALLOWANCE", "Money parents give kids each week, often for doing chores"]],
+ ["Clothes", [["BELT", "A strap worn around the waist to hold up pants"], ["SCARF", "A long strip of cloth worn around the neck for warmth"], ["SWEATER", "A knitted top you pull on for warmth"], ["TUXEDO", "A formal black suit, often worn with a bow tie"], ["PAJAMAS", "Loose, comfortable clothes you wear to bed"]], ["SUSPENDERS", "Straps over the shoulders that hold up pants"]],
+ ["Bakery", [["CAKE", "A sweet baked dessert, often with frosting, served at birthdays"], ["DOUGH", "The mixture of flour and water that you knead before baking bread"], ["CINNAMON", "A sweet brown spice made from tree bark, used in rolls"], ["BAGUETTE", "A long, thin loaf of French bread"], ["CROISSANT", "A flaky, crescent-shaped French pastry"]], ["PRETZEL", "A knotted, twisted bread sprinkled with coarse salt"]],
+ ["Movies", [["TICKET", "The pass you buy to get into a show"], ["POPCORN", "A snack of puffed corn kernels"], ["SEQUEL", "A movie that continues the story of an earlier one"], ["DIRECTOR", "The person in charge of making a film who guides the actors"], ["DOCUMENTARY", "A nonfiction film about real events or people"]], ["TRAILER", "A short preview of an upcoming movie"]],
+ ["Winter", [["SLED", "A small vehicle for sliding down snowy hills"], ["MITTEN", "A glove with one part for the fingers and one for the thumb"], ["ICICLE", "A hanging spike of ice"], ["SNOWFLAKE", "A single ice crystal that falls from the sky"], ["BLIZZARD", "A severe snowstorm with strong winds"]], ["SNOWPLOW", "A truck with a big blade on the front that clears the streets after a storm"]],
+ ["Party", [["CANDLE", "A wax stick with a wick that you light"], ["BALLOON", "A rubber bag you fill with air or helium"], ["CONFETTI", "Tiny pieces of colored paper thrown at celebrations"], ["INVITATION", "A card asking someone to come to an event"], ["ANNIVERSARY", "The date each year that marks a special event, like a wedding"]], ["KARAOKE", "Singing along to music while the words scroll on a screen"]],
+ ["Tools", [["HAMMER", "A tool for pounding nails"], ["PLIERS", "A tool with two hinged arms for gripping or bending wire"], ["WRENCH", "A tool for gripping and turning nuts and bolts"], ["SANDPAPER", "Rough paper used to smooth wood"], ["SCREWDRIVER", "A tool with a handle and a tip that turns screws"]], ["CHISEL", "A tool with a sharp, flat blade for carving wood or stone"]],
+ ["Thanksgiving", [["TURKEY", "The large bird roasted for a Thanksgiving dinner"], ["STUFFING", "The bread mixture cooked inside the turkey (some families call it dressing)"], ["PILGRIM", "One of the English settlers who sailed on the Mayflower in 1620"], ["CRANBERRY", "A small, sour red berry made into a sauce"], ["GRATITUDE", "The feeling of being thankful"]], ["CORNUCOPIA", "A horn-shaped basket overflowing with fruit and vegetables; the horn of plenty"]],
+ ["Fruit", [["LEMON", "A sour yellow citrus fruit"], ["BANANA", "A long curved fruit with a yellow peel"], ["PINEAPPLE", "A tropical fruit with spiky skin and a leafy crown"], ["RASPBERRY", "A small, soft red berry made of tiny round bumps"], ["POMEGRANATE", "A red fruit filled with juicy seeds"]], ["CANTALOUPE", "An orange melon with a rough, netted rind"]],
+ ["Vegetables", [["CORN", "Yellow kernels that grow on a cob"], ["CARROT", "An orange root vegetable that rabbits love"], ["BROCCOLI", "A green vegetable shaped like little trees"], ["ZUCCHINI", "A long green summer squash"], ["ASPARAGUS", "Thin green spears, often steamed or grilled"]], ["CAULIFLOWER", "A white vegetable with a head of tight florets, like pale broccoli"]],
+ ["Getting around", [["FERRY", "A boat that carries people and cars across water on a regular schedule"], ["SUBWAY", "An underground train that runs under a city"], ["BICYCLE", "A two-wheeled vehicle that you pedal"], ["HELICOPTER", "An aircraft lifted by spinning blades on top"], ["LIMOUSINE", "A long, luxurious car with a driver"]], ["SKATEBOARD", "A short board on four wheels that you ride and do tricks on"]],
+ ["Science", [["ATOM", "The tiny basic unit of matter"], ["MAGNET", "An object that attracts iron"], ["GRAVITY", "The force that pulls objects toward the Earth"], ["MICROSCOPE", "An instrument that makes tiny things look much bigger"], ["LABORATORY", "A room where scientists do experiments"]], ["MOLECULE", "Two or more atoms bonded together, like H2O"]],
+ ["Bathroom", [["SOAP", "Used with water to wash your hands"], ["TOWEL", "A cloth for drying yourself"], ["SHAMPOO", "A liquid soap for washing your hair"], ["TOOTHBRUSH", "A small brush for cleaning your teeth"], ["FAUCET", "The fixture that water flows out of when you turn the handle; the American word, not tap"]], ["MOUTHWASH", "A minty liquid you swish around to freshen your breath"]],
+ ["Jobs", [["PILOT", "A person who flies an airplane"], ["DENTIST", "A doctor who takes care of teeth"], ["PLUMBER", "A worker who fixes pipes, sinks and toilets"], ["CARPENTER", "A worker who builds things out of wood"], ["ARCHITECT", "A person who designs buildings"]], ["VETERINARIAN", "A doctor who treats animals"]],
+ ["Geography", [["ISLAND", "Land completely surrounded by water"], ["DESERT", "A dry region that gets very little rain"], ["CANYON", "A deep valley with steep rock walls, like the famous Grand one in Arizona"], ["VOLCANO", "A mountain that can erupt with lava"], ["PENINSULA", "Land almost surrounded by water but joined to the mainland"]], ["ARCHIPELAGO", "A group or chain of islands"]],
+ ["Living room", [["LAMP", "A light that stands on a table or the floor"], ["REMOTE", "The handheld device that changes the TV channel"], ["RECLINER", "An armchair that tips back while a footrest pops up"], ["FIREPLACE", "An opening in a wall where you build a fire"], ["CHANDELIER", "A fancy hanging light with many branches or crystals"]], ["OTTOMAN", "A padded footstool, often with storage inside, named after an old empire"]],
+ ["Insects", [["ANT", "A tiny insect that lives in colonies"], ["LADYBUG", "A small round red beetle with black spots"], ["BUTTERFLY", "An insect with large, colorful wings"], ["MOSQUITO", "A small biting insect that leaves itchy bumps"], ["CATERPILLAR", "A wormlike creature that turns into a butterfly"]], ["DRAGONFLY", "A long, thin insect with two pairs of see-through wings that darts over ponds"]]
+];
+/* Preview (a smAisle Daily Plus game): without Plus you get today's first card, then an "Unlock the rest" screen.
+   Preview when the URL has ?preview=1, or inside the smAisle Daily app (window.SMD_APP) without Plus (window.DG_APP.plus).
+   With Plus, or on the plain website link, it's the full game. */
+function isPreview(){try{if(/[?&]preview=1\b/.test(location.search))return true;if(window.SMD_APP)return !(window.DG_APP&&window.DG_APP.plus)}catch(e){}return false}
+const START='2026-11-02',CARDS=5,BONUS_SECS=20;
+
+/* ---------- Helpers ---------- */
+const $=id=>document.getElementById(id);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},
+  json(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},put(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function etParts(d){const p={};new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(d||new Date()).forEach(x=>p[x.type]=x.value);return p}
+function today(){const p=etParts();return `${p.year}-${p.month}-${p.day}`}
+const dnum=s=>Math.round((Date.parse(s+'T12:00:00Z')-Date.parse(START+'T12:00:00Z'))/864e5)+1;
+const dateOf=n=>new Date(Date.parse(START+'T12:00:00Z')+(n-1)*864e5).toISOString().slice(0,10);
+const themeFor=s=>THEMES[((dnum(s)-1)%THEMES.length+THEMES.length)%THEMES.length];
+const niceDate=s=>new Date(s+'T12:00:00Z').toLocaleDateString('en-US',{timeZone:'UTC',weekday:'long',month:'long',day:'numeric'});
+const shortDate=s=>new Date(s+'T12:00:00Z').toLocaleDateString('en-US',{timeZone:'UTC',weekday:'short',month:'short',day:'numeric'});
+const cap=w=>w.charAt(0)+w.slice(1).toLowerCase();
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),1800)}
+
+/* ---------- Game state. One saved record per day: c = card you're on, k = right letters typed on it,
+   res = 'W'/'L' per card played, bad = the wrong letter, done = game over. Saved after every letter so a reload can't undo a miss. ---------- */
+let DATE,TH,G,PAST=false,PRACTICE=false,spellOpen=false,busy=false;
+const keyOf=d=>'jx-day-'+d;
+function load(d){PRACTICE=false;DATE=d;PAST=d!==today();TH=themeFor(d);G=store.json(keyOf(d),null)||{c:0,k:0,res:[],bad:'',done:false};}
+function save(){if(!PRACTICE)store.put(keyOf(DATE),G)}
+/* Practice: play any other theme from the list, one after another. Nothing is saved or counted (no stats, streak or check-in). */
+function practice(){document.body.classList.remove('oncover');$('cover').hidden=true;const n=THEMES.length,base=(dnum(today())-1)%n;let i=+store.get('jx-practice','0')||0;i=i%(n-1)+1;store.set('jx-practice',String(i));
+  PRACTICE=true;PAST=true;DATE=today();TH=THEMES[(base+i)%n];G={c:0,k:0,res:[],bad:'',done:false};closeSheets();draw()}
+const word=()=>TH[1][G.c][0];
+
+/* ---------- Drawing ---------- */
+function drawTop(){
+  $('noLbl').textContent='No. '+dnum(DATE);
+  $('themeName').textContent=TH[0];
+  $('theme').firstChild.nodeValue=(PAST?'Theme ':"Today's theme ");
+  $('pastTag').hidden=!PAST;$('pastTag').textContent=PRACTICE?'Practice · not counted':'Archive · '+niceDate(DATE);
+  $('noLbl').textContent=PRACTICE?'Practice':'No. '+dnum(DATE);
+  const pv=isPreview()&&!PRACTICE&&!PAST;$('mArch').hidden=$('mPract').hidden=isPreview();
+  $('pips').innerHTML=TH[1].map((_,i)=>{if(pv&&i>0)return '<div class="pip lock">🔒</div>';const r=G.res[i];const cls=r==='W'?'w':r==='L'?'l':(!G.done&&i===G.c?'now':'');return `<div class="pip ${cls}">${r==='W'?'✓':r==='L'?'✕':i+1}</div>`}).join('');
+}
+function draw(){
+  drawTop();
+  if(isPreview()&&!PRACTICE&&!PAST&&G.res[0]){closeSpell();drawGate();return}
+  if(G.done){closeSpell();drawResult();return}
+  const [w,def]=TH[1][G.c],passed=G.k>=w.length;
+  $('stage').innerHTML=`<div class="dcard${passed?' ok':''}" id="card">
+    <div class="meta"><span>Card ${G.c+1} of ${CARDS}</span><span class="len">${w.length} letters</span></div>
+    <div class="word">${passed?cap(w):(G.k?`${w.slice(0,G.k)}<span class="q">…</span>`:'<span class="q">? ? ?</span>')}</div>
+    <div class="pos">noun</div>
+    <p class="def">${def}.</p>
+    ${passed?'<div class="stamp ok">Spelled</div>':''}
+  </div>
+  ${passed?`<button class="go hi" id="nextBtn">${G.c+1<CARDS?'Next card ›':'See your result ›'}</button>`:`<button class="go" id="spellBtn">${G.k?'Keep spelling':'Spell it'}</button>`}
+  <div class="small">${PRACTICE?'Practice game: it isn’t counted.':PAST?'Archive game: it won’t change your streak.':'One wrong letter and the game is over.'}</div>`;
+  if(passed)$('nextBtn').onclick=nextCard;else $('spellBtn').onclick=openSpell;
+  drawBoxes();
+}
+function drawBoxes(){
+  // The word length is hidden: show only the letters typed so far plus one blinking box for the next letter.
+  const w=word(),bw=Math.max(26,Math.min(38,Math.floor((Math.min(innerWidth,520)-20-11*5)/12)));
+  $('boxes').style.setProperty('--bw',bw+'px');
+  let h='';for(let i=0;i<G.k;i++)h+=`<div class="box ok${i===G.k-1&&drawBoxes.pop?' new':''}">${w[i]}</div>`;
+  if(G.k<w.length)h+=`<div class="box${busy?'':' cur'}"></div>`;
+  $('boxes').innerHTML=h;drawBoxes.pop=false;
+  $('spellHd').textContent=`Card ${G.c+1} · ${w.length} letters`;
+}
+function openSpell(){if(G.done)return;spellOpen=true;document.body.classList.add('typing');drawBoxes();$('spell').classList.add('up');$('spell').setAttribute('aria-hidden','false');$('stage').style.paddingBottom=($('spell').offsetHeight+10)+'px'}
+function closeSpell(){spellOpen=false;document.body.classList.remove('typing');$('spell').classList.remove('up');$('spell').setAttribute('aria-hidden','true');$('stage').style.paddingBottom=''}
+$('hideSpell').onclick=closeSpell;
+
+/* ---------- Typing ---------- */
+function press(L){
+  if(BON){pressBonus(L);return}
+  if(!spellOpen||busy||G.done)return;const w=word();if(G.k>=w.length)return;
+  const boxes=$('boxes').children;
+  if(L===w[G.k]){
+    G.k++;save();sfx('ok');
+    drawBoxes.pop=true;drawBoxes();
+    // keep the card's partial word in step
+    const wd=document.querySelector('#card .word');if(wd)wd.innerHTML=`${w.slice(0,G.k)}<span class="q">…</span>`;
+    if(G.k>=w.length){busy=true;G.res[G.c]='W';save();sfx(G.c+1>=CARDS?'win':'card');
+      setTimeout(()=>{busy=false;closeSpell();if(G.c+1>=CARDS){finish()}else draw()},650)}
+  }else{
+    busy=true;G.bad=L;G.res[G.c]='L';G.done=true;save();sfx('bad');if(navigator.vibrate)try{navigator.vibrate(120)}catch(e){}
+    const b=boxes[boxes.length-1];b.className='box bad';b.textContent=L;
+    setTimeout(()=>{ // then show the right spelling: the rest of the word in red
+      b.className='box rev';b.textContent=w[G.k];for(let i=G.k+1;i<w.length;i++){const e=document.createElement('div');e.className='box rev';e.textContent=w[i];$('boxes').appendChild(e)}
+      setTimeout(()=>{busy=false;finish(true)},1300)},500);
+  }
+}
+function nextCard(){G.c++;G.k=0;save();draw();openSpell()}
+function buildKb(){
+  $('kb').innerHTML=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'].map(r=>`<div class="row">${[...r].map(c=>`<button data-k="${c}">${c}</button>`).join('')}</div>`).join('');
+  $('kb').addEventListener('pointerdown',e=>{const b=e.target.closest('button');if(!b)return;e.preventDefault();press(b.dataset.k)});
+}
+document.addEventListener('keydown',e=>{
+  if(e.metaKey||e.ctrlKey||e.altKey||document.querySelector('.sheet:not([hidden])'))return;
+  if(/^[a-z]$/i.test(e.key)){if(!spellOpen&&!G.done&&G.k<word().length)openSpell();press(e.key.toUpperCase())}
+  else if(e.key==='Enter'){const b=$('nextBtn')||$('spellBtn');if(b)b.click()}
+});
+
+/* ---------- Bonus round: beat the clock. After the 5 cards, a 6th themed word to spell in BONUS_SECS seconds.
+   One wrong letter or running out of time ends it. G.bs = when the clock started (so a reload can't reset it),
+   G.b = {r:'W'|'L'|'T', s:seconds taken, k:letters right, bad:wrong letter}. Doesn't change the x/5 score. ---------- */
+let BON=null;
+const bonusWord=()=>TH[2];
+function bonusBlock(){
+  if(!TH[2])return '';
+  if(!G.b)return `<button class="go bonus" id="bonusBtn">⚡ Bonus round: beat the clock</button>`;
+  const w=TH[2][0];
+  return G.b.r==='W'?`<div class="bres w">⚡ Bonus: <b>${cap(w)}</b> in ${G.b.s}s</div>`:`<div class="bres l">⚡ Bonus missed: <b>${cap(w)}</b>${G.b.r==='T'?' (time ran out)':` (you typed “${G.b.bad}”)`}</div>`;
+}
+function bonusIntro(){
+  if(G.bs&&!G.b)return startBonus();
+  const [w]=TH[2];
+  $('stage').innerHTML=`<div class="dcard" id="card"><div class="meta"><span>⚡ Bonus round</span><span class="len">${w.length} letters</span></div>
+    <div class="word" style="font-size:40px">${BONUS_SECS} seconds</div>
+    <p class="def" style="padding-left:0">One more ${TH[0].toLowerCase()} word. The clock starts when you tap Start, and the definition shows up then. Spell it before time runs out. One wrong letter ends it.</p>
+    <style>.dcard .def::before{content:none}</style></div>
+    <button class="go bonus" id="bStart">Start the clock</button>
+    <button class="link" id="bBack" style="display:block;margin:10px auto">Back to results</button>`;
+  $('bStart').onclick=startBonus;$('bBack').onclick=draw;
+}
+function startBonus(){
+  if(G.b)return draw();
+  if(!G.bs){G.bs=Date.now();G.bk=0;save()}
+  const [w,def]=TH[2];BON={w,k:G.bk||0};
+  $('stage').innerHTML=`<div class="dcard" id="card"><div class="meta"><span>⚡ Bonus round</span><span class="len">${w.length} letters</span></div>
+    <div class="clock"><i id="clockBar"></i><b id="clockNum"></b></div>
+    <div class="pos">noun</div><p class="def">${def}.</p></div>`;
+  spellOpen=true;document.body.classList.add('typing');drawBonusBoxes();$('spell').classList.add('up');$('stage').style.paddingBottom=($('spell').offsetHeight+10)+'px';
+  clearInterval(BON.iv);BON.iv=setInterval(bonusTick,100);bonusTick();
+}
+function bonusLeft(){return BONUS_SECS-(Date.now()-G.bs)/1000}
+function bonusTick(){if(!BON)return;const left=Math.max(0,bonusLeft());
+  const bar=$('clockBar'),num=$('clockNum');if(bar){bar.style.width=(left/BONUS_SECS*100)+'%';bar.classList.toggle('low',left<6)}if(num)num.textContent=Math.ceil(left)+'s';
+  if(left<=0&&!busy)endBonus('T')}
+function drawBonusBoxes(){const w=BON.w;$('boxes').style.setProperty('--bw',Math.max(24,Math.min(38,Math.floor((Math.min(innerWidth,520)-20-11*5)/12)))+'px');
+  let h='';for(let i=0;i<BON.k;i++)h+=`<div class="box ok${i===BON.k-1&&drawBoxes.pop?' new':''}">${w[i]}</div>`;
+  if(BON.k<w.length)h+=`<div class="box${busy?'':' cur'}"></div>`;$('boxes').innerHTML=h;drawBoxes.pop=false;
+  $('spellHd').textContent=`⚡ Bonus · ${w.length} letters`}
+function pressBonus(L){if(busy||!BON)return;const w=BON.w;if(bonusLeft()<=0)return endBonus('T');
+  if(L===w[BON.k]){BON.k++;G.bk=BON.k;save();sfx('ok');drawBoxes.pop=true;drawBonusBoxes();if(BON.k>=w.length)endBonus('W')}
+  else{const bx=$('boxes').children,b=bx[bx.length-1];b.className='box bad';b.textContent=L;endBonus('L',L)}}
+function endBonus(r,bad){if(!BON||busy)return;busy=true;clearInterval(BON.iv);
+  const secs=Math.min(BONUS_SECS,Math.round((Date.now()-G.bs)/100)/10);
+  G.b={r,s:secs,k:BON.k,bad:bad||''};save();sfx(r==='W'?'win':'bad');
+  if(r!=='W'){const w=BON.w;setTimeout(()=>{const bx=$('boxes');const last=bx.lastChild;if(last&&BON.k<w.length){last.className='box rev';last.textContent=w[BON.k]}
+    for(let i=BON.k+1;i<w.length;i++){const e=document.createElement('div');e.className='box rev';e.textContent=w[i];bx.appendChild(e)}},400)}
+  if(!PAST){const h=store.json('jx-bonus',{});if(h[DATE]==null){h[DATE]=r==='W'?secs:-1;store.put('jx-bonus',h)}checkIn('bonus')}
+  setTimeout(()=>{busy=false;BON=null;closeSpell();draw()},r==='W'?900:1700)}
+
+/* ---------- End of game ---------- */
+function score(g){return (g.res||[]).filter(r=>r==='W').length}
+function drawGate(){
+  const [w,d]=TH[1][0],ok=G.res[0]==='W';
+  $('stage').innerHTML=`<div class="dcard ${ok?'ok':'bad'}" id="card"><div class="meta"><span>Card 1 of ${CARDS}</span><span class="len">${w.length} letters</span></div>
+    <div class="word">${cap(w)}</div><div class="pos">noun</div><p class="def">${d}.</p><div class="stamp ${ok?'ok':'bad'}">${ok?'Spelled':'Missed'}</div></div>
+  <div class="gate"><div class="star">★ PLUS</div><h2>Unlock the rest with smAisle Daily Plus</h2>
+    <p>${ok?'Nice spelling! ':''}Plus gets you all 5 cards every day, the ⚡ beat-the-clock bonus round, Practice and the Archive.</p>
+    <button class="go hi" id="gateDaily" style="text-transform:none">‹ smAisle Daily</button></div>
+  <div class="small">This was today’s free preview of Jexicon.</div>`;
+  $('gateDaily').onclick=goDaily;
+}
+function showCover(){
+  closeSheets();closeSpell();load(today());const pv=isPreview(),t=dnum(today());
+  const st=G.done?`<small>${score(G)}/${CARDS}${G.b&&G.b.r==='W'?' · ⚡':''}</small>Result ›`:pv&&G.res[0]?'<small>Preview done</small>Plus ›':(G.c||G.k)?'Keep<br>playing ›':'Play ›';
+  $('cover').innerHTML=`<div class="rule"></div><h1>Jexicon</h1><div class="rule"></div>
+    <div class="tag">Read the definition. Spell the word, one letter at a time. One wrong letter and you’re out.</div>
+    <div class="date">No. ${t} · ${shortDate(today())} · <b>${TH[0]}</b></div>
+    <button class="play" id="cvPlay"><span><span class="t">Today’s game</span><br><span class="s">${pv?'Free preview · card 1':'5 cards + ⚡ bonus'}</span></span><span class="go2">${st}</span></button>
+    <div class="links">${pv?'':'<button id="cvArch">Archive</button> · '}<button id="cvStats">Stats</button> · <button id="cvHelp">How to Play</button>${pv?'':' · <button id="cvPract">Practice</button>'}</div>
+    <button class="daily" id="cvDaily">‹ smAisle Daily <i>Back to today’s games</i></button>
+    <div class="ver">Jexicon · v${VERSION} · ${VDATE} · smAisle</div>`;
+  document.body.classList.add('oncover');$('cover').hidden=false;
+  $('cvPlay').onclick=hideCover;$('cvStats').onclick=showStats;$('cvHelp').onclick=()=>only('sHelp');$('cvDaily').onclick=goDaily;
+  if(!pv){$('cvArch').onclick=showArchive;$('cvPract').onclick=()=>{hideCover();practice()}}
+}
+function hideCover(){document.body.classList.remove('oncover');$('cover').hidden=true;draw()}
+function goDaily(){location.href='https://smaisle.app/daily/'}
+function finish(lost){
+  if(!lost){G.c=CARDS-1;G.done=true;save()}
+  if(!PAST){recordDay();markDone();checkIn('play')}
+  draw();
+}
+const MSG=['Tough one. Tomorrow’s a new day.','One down. Not bad.','Two for five. Keep at it.','Three for five. Nicely spelled.','Four for five. So close!','Perfect day. Five for five!'];
+function squares(g){let s='';for(let i=0;i<CARDS;i++){const r=g.res[i];s+=r==='W'?'🟩':r==='L'?'🟥':'⬜'}return s}
+function drawResult(){
+  const s=score(G);
+  if(G.bs&&!G.b&&!BON){setTimeout(startBonus,0)}
+  $('stage').innerHTML=`<div id="result" class="dcard${s===CARDS?' ok':''}">
+    <div class="meta"><span>${PRACTICE?'':'No. '+dnum(DATE)+' · '}${TH[0]}</span><span>${PRACTICE?'Practice':PAST?'Archive':'Today'}</span></div>
+    <div class="big">${s}/${CARDS}</div>
+    <div class="sq">${squares(G)}</div>
+    <div class="msg">${MSG[s]}</div>
+  </div>
+  ${bonusBlock()}
+  ${PRACTICE?'':'<button class="go hi" id="shareBtn">Share result</button>'}
+  <button class="go ${PRACTICE?'hi':'alt'}" id="practBtn">Practice another theme</button>
+  ${PAST?`<button class="go alt" id="backToday">Back to today</button>`:`<div class="small">Next game in <div class="countdown" id="cd"></div></div>`}
+  <div class="small"><button class="link" id="rArch">Archive</button> · <button class="link" id="rStats">Stats</button></div>
+  <h3 style="font:800 12px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin:18px 0 6px">${PAST?'The':'Today’s'} words</h3>
+  <div style="text-align:left;margin-bottom:20px">${TH[1].map(([w,d],i)=>{const r=G.res[i];return `<div class="wl ${r==='W'?'w':r==='L'?'l':''}"><b>${cap(w)}</b>${r==='L'&&G.bad?` <span style="font:700 12px var(--sans);color:var(--red)">you typed “${G.bad}” for letter ${G.k+1}</span>`:''}<div>${d}.</div></div>`}).join('')}</div>`;
+  if($('shareBtn'))$('shareBtn').onclick=share;if($('bonusBtn'))$('bonusBtn').onclick=bonusIntro;$('practBtn').onclick=practice;$('rArch').onclick=showArchive;$('rStats').onclick=showStats;
+  if(PAST)$('backToday').onclick=()=>{load(today());draw();checkIn('open',true)};
+  tick();
+}
+function tick(){const e=$('cd');if(!e)return;const p=etParts(),left=86400-(+p.hour*3600+ +p.minute*60+ +p.second),h=Math.floor(left/3600),m=Math.floor(left%3600/60),s=left%60;
+  e.textContent=`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  if(left<=1)setTimeout(()=>{if(!PAST){load(today());draw()}},1500)}
+setInterval(tick,1000);
+function share(){
+  const bb=G.b?(G.b.r==='W'?`\n⚡ Bonus in ${G.b.s}s`:'\n⚡ Bonus ✕'):'';
+  const t=`Jexicon No. ${dnum(DATE)} · ${TH[0]}\n${squares(G)} ${score(G)}/${CARDS}${bb}\nhttps://smaisle.app/Jexicon/`;
+  if(navigator.share){navigator.share({text:t}).catch(()=>{});return}
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast('Copied to clipboard')).catch(()=>{prompt('Copy your result:',t)});
+}
+
+/* ---------- Stats (today's games only; Archive games don't count) ---------- */
+function hist(){return store.json('jx-hist',{})}
+function recordDay(){const h=hist();if(h[DATE]==null){h[DATE]=score(G);store.put('jx-hist',h)}}
+function streaks(h){const days=Object.keys(h).sort();let best=0,run=0,prev=null;
+  days.forEach(d=>{run=(prev&&dnum(d)===dnum(prev)+1)?run+1:1;best=Math.max(best,run);prev=d});
+  const t=today(),last=days[days.length-1];const cur=last&&(last===t||dnum(last)===dnum(t)-1)?run:0;return {cur,best}}
+function bonusStats(){const v=Object.values(store.json('jx-bonus',{}));const w=v.filter(x=>x>=0);return {won:w.length,best:w.length?Math.min(...w)+'s':'–'}}
+function showStats(){
+  const h=hist(),v=Object.values(h),n=v.length,perf=v.filter(x=>x===CARDS).length,st=streaks(h),avg=n?(v.reduce((a,b)=>a+b,0)/n).toFixed(1):'–';
+  const dist=[0,1,2,3,4,5].map(k=>v.filter(x=>x===k).length),mx=Math.max(1,...dist),mine=h[today()];
+  $('statsBody').innerHTML=`<div class="statrow"><div><b>${n}</b><span>Played</span></div><div><b>${avg}</b><span>Avg cards</span></div><div><b>${st.cur}</b><span>Streak</span></div><div><b>${st.best}</b><span>Best streak</span></div></div>
+  <div class="statrow" style="grid-template-columns:1fr"><div><b>${perf}</b><span>Perfect days (5/5)</span></div></div>
+  <h3>Cards passed</h3>${dist.map((c,k)=>`<div class="bar"><span style="width:14px">${k}</span><i class="${mine===k?'me':''}" style="width:${Math.max(8,c/mx*100)}%">${c}</i></div>`).join('')}
+  <div class="statrow" style="grid-template-columns:1fr 1fr"><div><b>${bonusStats().won}</b><span>Bonus rounds beaten</span></div><div><b>${bonusStats().best}</b><span>Fastest bonus</span></div></div>
+  <p class="small">Stats count each day’s game played on its day. Archive games don’t count.</p>`;
+  only('sStats');
+}
+
+/* ---------- Archive ---------- */
+function showArchive(){
+  const t=dnum(today());let html='';
+  for(let n=t;n>=1;n--){const d=dateOf(n),g=store.json(keyOf(d),null),th=themeFor(d);
+    const r=g&&g.done?`${squares(g)}`:g&&(g.c||g.k)?'In progress':'Play ›';
+    html+=`<button class="arch" data-d="${d}"><span>No. ${n} · ${th[0]}<small>${shortDate(d)}${n===t?' · Today':''}</small></span><span class="r">${r}</span></button>`}
+  $('archBody').innerHTML=html;
+  $('archBody').querySelectorAll('.arch').forEach(b=>b.onclick=()=>{closeSheets();load(b.dataset.d);document.body.classList.remove('oncover');$('cover').hidden=true;draw()});
+  only('sArch');
+}
+
+/* ---------- Sheets and menu ---------- */
+function only(id){closeSheets();closeSpell();$(id).hidden=false}
+function closeSheets(){document.querySelectorAll('.sheet').forEach(s=>s.hidden=true)}
+document.querySelectorAll('.sheet').forEach(s=>{s.addEventListener('click',e=>{if(e.target===s||e.target.closest('[data-close]'))s.hidden=true})});
+$('menuBtn').onclick=()=>only('sMenu');
+$('mHelp').onclick=()=>only('sHelp');$('mArch').onclick=showArchive;$('mStats').onclick=showStats;$('mPract').onclick=practice;
+$('mDaily').onclick=goDaily;$('mHome').onclick=showCover;
+$('helpGo').addEventListener('click',()=>{if(!$('cover').hidden)hideCover();if(!agreed()){store.set(TERMS_KEY,new Date().toISOString());checkIn('open')}});
+$('menuVer').textContent=`Jexicon · v${VERSION} · ${VDATE} · smAisle`;
+
+/* Dark mode: Off (smAisle colors, the default) / On (Navy) / Match phone. Shared on smaisle.app as localStorage "smaisle-dark". */
+const DM_MQ=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
+function dmGet(){return store.get('smaisle-dark','off')}
+function dmApply(){const m=dmGet(),dark=m==='on'||(m==='auto'&&DM_MQ&&DM_MQ.matches);
+  if(dark)document.documentElement.setAttribute('data-mode','navy');else document.documentElement.removeAttribute('data-mode');
+  const tc=document.querySelector('meta[name="theme-color"]');if(tc)tc.content=dark?'#121b2e':'#f4efe1';
+  try{window.webkit.messageHandlers.dg.postMessage({cmd:'mode',navy:!!dark})}catch(e){}
+  document.querySelectorAll('#dmSeg button').forEach(b=>b.classList.toggle('on',b.dataset.m===m))}
+document.querySelectorAll('#dmSeg button').forEach(b=>b.onclick=()=>{store.set('smaisle-dark',b.dataset.m);dmApply()});
+if(DM_MQ&&DM_MQ.addEventListener)DM_MQ.addEventListener('change',dmApply);
+
+/* ---------- Sound: little synth tones. On/off in the menu. ---------- */
+let ac=null,acStale=false;const soundOn=()=>store.get('jx-sound','on')!=='off';
+function newAc(){ac=new (window.AudioContext||window.webkitAudioContext)();const b=ac.createBufferSource();b.buffer=ac.createBuffer(1,1,22050);b.connect(ac.destination);b.start(0)}
+function unlockAudio(){if(!soundOn()||(ac&&ac.state==='running'&&!acStale))return;acStale=false;
+  try{if(!ac)return newAc();ac.resume().catch(()=>{});const old=ac;setTimeout(()=>{if(ac===old&&old.state!=='running'){try{old.close()}catch(e){}ac=null;try{newAc()}catch(e){}}},250)}catch(e){}}
+['pointerdown','touchend','click','keydown'].forEach(ev=>document.addEventListener(ev,unlockAudio,true));
+document.addEventListener('visibilitychange',()=>{if(document.hidden)acStale=true});
+function tone(f,t0,dur,type,vol){const o=ac.createOscillator(),g=ac.createGain();o.type=type||'sine';o.frequency.value=f;g.gain.setValueAtTime(0,ac.currentTime+t0);
+  g.gain.linearRampToValueAtTime(vol||.15,ac.currentTime+t0+.01);g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+t0+dur);o.connect(g);g.connect(ac.destination);o.start(ac.currentTime+t0);o.stop(ac.currentTime+t0+dur+.05)}
+function sfx(k){if(!soundOn()||!ac)return;try{
+  if(k==='ok')tone(880,0,.08,'triangle',.12);
+  else if(k==='bad'){tone(160,0,.35,'sawtooth',.12);tone(120,.12,.4,'sawtooth',.1)}
+  else if(k==='card'){tone(660,0,.1,'triangle');tone(990,.09,.18,'triangle')}
+  else if(k==='win'){[523,659,784,1047].forEach((f,i)=>tone(f,i*.11,.3,'triangle'))}}catch(e){}}
+const sndApply=()=>document.querySelectorAll('#sndSeg button').forEach(b=>b.classList.toggle('on',b.dataset.s===(soundOn()?'on':'off')));
+document.querySelectorAll('#sndSeg button').forEach(b=>b.onclick=()=>{store.set('jx-sound',b.dataset.s);sndApply();unlockAudio();setTimeout(()=>sfx('ok'),50)});
+
+/* ---------- smAisle Daily hub: when today's game is over, add "jx" to localStorage 'smaisle_done'
+   {"YYYY-MM-DD":["jx",...]} (device-local date, last 60 days), same as SMAISLE.markDone in daily/games.js. ---------- */
+function markDone(){if(PAST||!G.done)return;try{const d=new Date(),day=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  let s=store.json('smaisle_done',{})||{};s[day]=s[day]||[];if(s[day].indexOf('jx')<0)s[day].push('jx');
+  const k=Object.keys(s).sort();while(k.length>60)delete s[k.shift()];store.put('smaisle_done',s)}catch(e){}}
+
+/* ---------- Usage check-in (website copy only, after the player agrees). Collection jx_devices in aislerun-88e79.
+   o = opens per day, h = cards passed per day (0-5, set when that day's game is over), on today's game only. ---------- */
+const FB_KEY='AIzaSyAlbSCTpAiK-1tojkyWrY3QuJsSzILHSfs',FB_PROJ='aislerun-88e79',TERMS_KEY='jx-terms';
+function agreed(){return !!store.get(TERMS_KEY,'')}
+function devId(){let id=store.get('jx-dev','');if(!id){id=Array.from(crypto.getRandomValues(new Uint8Array(12)),b=>'abcdefghijklmnopqrstuvwxyz0123456789'[b%36]).join('');store.set('jx-dev',id)}return id}
+function trimMap(m){const k=Object.keys(m).sort();while(k.length>60)delete m[k.shift()];return m}
+async function checkIn(kind,noCount){
+  if(!agreed())return;
+  const day=today(),u=store.json('jx-usage',{first:day,days:0,opens:0,plays:0,o:{}});
+  if(u.o[day]==null){u.days++;u.o[day]=0}
+  if(kind==='open'&&!noCount){u.opens++;u.o[day]++}
+  if(kind==='play')u.plays++;
+  const bh=store.json('jx-bonus',{}),bm={};Object.keys(bh).sort().slice(-60).forEach(k=>bm[k]=Math.round(bh[k]*10));
+  trimMap(u.o);store.put('jx-usage',u);
+  if(!/github\.io$|smaisle\.app$/.test(location.hostname)&&!window.JX_TEST)return;
+  const h=hist(),hm={};Object.keys(h).sort().slice(-60).forEach(k=>hm[k]=h[k]);
+  const st=streaks(h),vals=Object.values(h);
+  const I=n=>({integerValue:String(Math.round(n)||0)}),T=v=>({stringValue:String(v)}),M=m=>({mapValue:{fields:Object.fromEntries(Object.entries(m).map(([k,v])=>[k,I(v)]))}});
+  const body={fields:{first:T(u.first),last:T(day),days:I(u.days),v:T(VERSION),opens:I(u.opens),plays:I(u.plays),done:I(vals.length),perfect:I(vals.filter(x=>x===CARDS).length),
+    streak:I(st.cur),best:I(st.best),terms:T(store.get(TERMS_KEY,'').slice(0,10)),desk:{booleanValue:innerWidth>=820},t:I(Date.now()),o:M(u.o),h:M(hm),b:M(bm),bwon:I(Object.values(bh).filter(x=>x>=0).length)}};
+  try{await fetch(`https://firestore.googleapis.com/v1/projects/${FB_PROJ}/databases/(default)/documents/${GAME}_devices/${devId()}?key=${FB_KEY}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),keepalive:true})}catch(e){}
+}
+
+/* ---------- Start ---------- */
+buildKb();dmApply();sndApply();load(today());draw();showCover();
+if(!agreed())only('sHelp');else checkIn('open');
+addEventListener('resize',()=>{if(!G.done&&!BON)drawBoxes()});
+</script>
+</body>
+</html>
