@@ -1,6 +1,6 @@
 # Jexicon
 
-A daily definition spelling game by smAisle. Read the definition, then spell the word one letter at a time. One wrong letter and you're out. Five themed cards a day, plus a 20-second bonus round.
+A daily definition spelling game by smAisle. Read the definition, then spell the word one letter at a time. One wrong letter and you're out. Five themed cards a day, 25 seconds each, plus a 15-second bonus round.
 
 - Plays at https://smaisle.app/Jexicon/
 - A smAisle Daily Plus game: `?preview=1` (or the smAisle Daily app without Plus) plays today's first card as a free preview.
@@ -12,3 +12,7 @@ A daily definition spelling game by smAisle. Read the definition, then spell the
 
 ## v2.3 (Nov 2)
 - Finish screen standard: smAisle Daily button and More smAisle games row (results and the Plus gate). Usage check-in adds code, the invite code for the By code table on the stats page (change list #10). Replaces PR #3.
+
+## v2.4 (Nov 2)
+- Every card has a 25-second clock (change list #8), and running out ends the game like a wrong letter. The clock pauses while the app is away, a menu is open or the front page shows.
+- Bonus round is 15 seconds (change list #9). Both clocks show an on-screen alert and play a sound at 10 and 5 seconds left.
