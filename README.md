@@ -19,3 +19,6 @@ A daily definition spelling game by smAisle. Read the definition, then spell the
 
 ## v2.5 (Nov 3)
 - One way home (navigation standard): the yellow ‹ smAisle Daily button sits top left in the same spot on the cover and in the game, including while spelling. It replaces the footer row. smAisle Home is now a small link on the cover's version line.
+
+## v2.6 (Nov 3)
+- Correction from Jeff: the yellow ‹ smAisle Daily button shows on the cover only, never during play. During play the way back is the ‹ smAisle Daily row in the menu. The results screen keeps its row.
