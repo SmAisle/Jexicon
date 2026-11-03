@@ -16,3 +16,6 @@ A daily definition spelling game by smAisle. Read the definition, then spell the
 ## v2.4 (Nov 2)
 - Every card has a 25-second clock (change list #8), and running out ends the game like a wrong letter. The clock pauses while the app is away, a menu is open or the front page shows.
 - Bonus round is 15 seconds (change list #9). Both clocks show an on-screen alert and play a sound at 10 and 5 seconds left.
+
+## v2.5 (Nov 3)
+- One way home (navigation standard): the yellow ‹ smAisle Daily button sits top left in the same spot on the cover and in the game, including while spelling. It replaces the footer row. smAisle Home is now a small link on the cover's version line.
