@@ -26,3 +26,6 @@ A daily definition spelling game by smAisle. Read the definition, then spell the
 ## v2.7 (Nov 3)
 - Menu standard (Jeff): the menu now matches Straight Down Spell. Top to bottom: Menu, Back to game (new), then the two-column grid, Home Screen and ‹ smAisle Daily side by side, Settings, version.
 - The ⭐ Plus row shows only in the preview and opens the Plus sheet (new for Jexicon, the same words as the end-of-preview screen, because that screen shows the first card's answer). Plus players and the plain website don't see it.
+
+## v2.10 (Nov 4)
+- One demo for every game (change list #30): Try it with a coach. The old looping demo in How to Play is gone. "Try the demo" is in How to Play and on the cover. Three real moves on a practice card with the clock off, using the shared demo frame (inlined). Nothing is saved or counted, and How to Play stays open underneath so Skip goes back to it.

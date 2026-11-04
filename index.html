@@ -170,22 +170,39 @@ body.oncover #top,body.oncover #pastTag,body.oncover #theme,body.oncover #pips,b
 #cover .links button{background:none;border:0;padding:6px 4px;text-decoration:underline;text-underline-offset:3px;font:inherit;letter-spacing:inherit}
 #cover .ver{font:600 12px var(--sans);color:var(--fade);margin-top:14px}#cover .ver a{color:inherit}
 @media (max-height:620px){#cover h1{font-size:52px}#cover{padding-top:8px}}
-/* How to Play: one screen on an iPhone, with a looping demo of two turns */
+/* How to Play: one screen on an iPhone */
 .help h2{margin-bottom:8px}
 .help ul{margin:10px 0 6px;padding-left:18px}.help li{font:14.5px/1.42 var(--body);margin:3px 0}
 .help .hsmall{font:600 12px/1.4 var(--sans);color:var(--ink2);margin:6px 0 0}.help a{color:var(--ink)}
 .help .go{margin-top:10px;padding:12px}
-.demo{background:var(--card);border:2px solid var(--line);box-shadow:4px 4px 0 var(--shadow);padding:10px 12px 8px;margin-right:4px}
-.dm-meta{display:flex;justify-content:space-between;align-items:center;font:700 10.5px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--fade)}
-.dm-meta .len{background:var(--hi);color:var(--hi-ink);border:2px solid var(--line);padding:1px 6px;font-size:11px}
-.dm-def{font:15px/1.35 var(--body);margin:6px 0 8px;min-height:20px}
-.dm-boxes{display:flex;justify-content:center;gap:5px;min-height:38px}
-.dm-boxes .box{--bw:30px}
-.dm-note{text-align:center;font:800 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;margin-top:5px;min-height:16px}
-.dm-note.ok{color:var(--green)} .dm-note.bad{color:var(--red)}
-@media (max-height:600px){.help li{font-size:12.5px!important;line-height:1.35}.help ul{margin:6px 0 4px}.dm-boxes .box{--bw:24px}.dm-boxes{min-height:30px}.help .go{padding:9px;margin-top:6px}.demo{padding:7px 10px 5px}}
-@media (max-height:700px){.help li{font-size:13.5px;margin:2px 0}.help h2{font-size:22px}.dm-def{font-size:14px}.sheet>.box2.help{padding:14px 14px 12px}}
+@media (max-height:600px){.help li{font-size:12.5px!important;line-height:1.35}.help ul{margin:6px 0 4px}.help .go{padding:9px;margin-top:6px}}
+@media (max-height:700px){.help li{font-size:13.5px;margin:2px 0}.help h2{font-size:22px}.sheet>.box2.help{padding:14px 14px 12px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<style id="smDemoCss">
+#smDemo{position:fixed;left:0;right:0;top:0;height:100vh;height:100dvh;z-index:50;display:flex;flex-direction:column;background:var(--paper);color:var(--ink);font-family:var(--sans,"Libre Franklin",Arial,sans-serif);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+#smDemo::after{content:"";position:absolute;inset:0;z-index:30;pointer-events:none;border:6px solid transparent;background:repeating-linear-gradient(45deg,#ffe27a 0 12px,#1a1814 12px 24px) border-box;-webkit-mask:linear-gradient(#000 0 0) padding-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) padding-box exclude,linear-gradient(#000 0 0)}
+.smTop{flex:none;height:50px;display:flex;align-items:center;justify-content:space-between;padding:6px 12px 0 14px;background:#ffe27a;color:#1a1814;border-bottom:3px solid #1a1814}.smTop span{display:flex;align-items:center;gap:8px;min-width:0}.smTop b{background:#1a1814;color:#ffe27a;font:900 15px/1 var(--sans,Arial);letter-spacing:.14em;padding:5px 7px 5px 9px;border-radius:3px}.smTop i{font:800 11.5px var(--sans,Arial);font-style:normal}.smTop button{position:relative;z-index:31;height:32px;padding:0 12px;border:2px solid #1a1814;border-radius:3px;background:#fffdf6;color:#1a1814;font:800 12px var(--sans,Arial);letter-spacing:.08em;text-transform:uppercase}
+.smStage{position:relative;flex:1 1 0;min-height:0;overflow:hidden;padding:10px 14px 8px}.smStage::before{content:"DEMO";position:absolute;left:50%;top:52%;z-index:3;transform:translate(-50%,-50%) rotate(-22deg);font:900 118px/1 var(--head,Georgia,serif);letter-spacing:.04em;color:var(--ink);opacity:.09;pointer-events:none}
+.smCap{flex:none;background:var(--card);border-top:2px solid var(--ink);padding:9px 16px 14px;display:grid;gap:5px}.smH{display:flex;justify-content:space-between;align-items:baseline}.smH b{font:900 19px var(--head,Georgia,serif)}.smH small{font:800 11px var(--sans,Arial);letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}.smCap p{margin:0;min-height:60px;font:500 15px/20px var(--sans,Arial)}.smCap p.nudge{background:#ffe27a;color:#1a1814;margin:0 -6px;padding:0 6px;border-radius:3px}
+.smDots{display:flex;gap:6px}.smDots i{width:10px;height:10px;border:2px solid var(--ink);border-radius:50%}.smDots i.on{background:var(--btn)}
+.smSlot{min-height:44px;margin-top:2px}.smTurn{height:44px;display:flex;align-items:center;justify-content:center;text-align:center;border:2px dashed var(--ink2);border-radius:3px;font:800 12px var(--sans,Arial);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.smBtn{display:block;width:100%;height:46px;border:2px solid var(--ink);border-radius:3px;background:var(--btn);color:var(--paper);font:800 14px var(--sans,Arial);letter-spacing:.08em;text-transform:uppercase}.smBtn.alt{background:var(--card);color:var(--ink)}
+.smF{position:absolute;z-index:7;width:0;height:0;pointer-events:none;transition:left .5s ease,top .5s ease}.smF svg{position:absolute;left:-13px;top:-2px;width:38px;height:46px;transform-origin:13px 2px;animation:smBob .9s ease-in-out infinite}.smF.up svg{transform:scaleY(-1);animation:none}.smR{position:absolute;z-index:6;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;border:3px solid #ffe27a;pointer-events:none;animation:smRip .5s ease-out forwards}.smW{animation:smWob .28s ease 2}
+@keyframes smBob{50%{translate:3px 6px}}@keyframes smRip{to{transform:scale(4.4);opacity:0}}@keyframes smWob{25%{translate:-4px 0}75%{translate:4px 0}}
+.smPop{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(26,24,20,.62);animation:smIn .25s ease both}.smPc{width:100%;max-width:340px;background:var(--paper);color:var(--ink);border:3px double var(--ink);box-shadow:6px 6px 0 rgba(0,0,0,.3);padding:16px;display:grid;gap:10px;text-align:center}.smPc h3{margin:0;font:900 34px/1.1 var(--head,Georgia,serif);border-bottom:3px double var(--ink);padding-bottom:8px}.smPc p{margin:0 0 4px;font:500 15px/1.35 var(--sans,Arial)}
+@keyframes smIn{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.smF svg{animation:none}.smF{transition:none}}
+@media (max-height:640px){.smTop{height:42px;padding-top:4px}.smStage{padding:6px 12px 4px}.smCap{padding:5px 14px 9px;gap:3px}.smCap p{min-height:40px;font-size:13.5px;line-height:18px}.smH b{font-size:16px}.smDots{display:none}.smSlot{min-height:0;margin:0}.smTurn{display:none}.smBtn{height:40px}}
+/* Jexicon's practice board inside the demo frame */
+#smDemo .dcard{animation:none;margin:0 6px 0 0;padding:12px 14px;box-shadow:4px 4px 0 var(--shadow)}
+#smDemo .dcard .meta{margin-bottom:8px}#smDemo .clock{margin:0 0 8px}#smDemo .clock b{color:var(--hi-ink)}#smDemo .dcard .word{font-size:24px;min-height:27px;margin-bottom:2px}#smDemo .dcard .def{font-size:15.5px;line-height:1.4}#smDemo .dcard .def::before{line-height:1.5}#smDemo .stamp{top:48px}
+#smDemo .go{margin-top:12px;padding:12px}
+.jdB{position:relative;z-index:1}.jdSp{margin-top:10px;background:var(--paper2);border:2px solid var(--line);padding:8px 5px 3px}
+.jdSp .hd{font:700 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);text-align:center;margin-bottom:6px}.jdSp .bxs{display:flex;justify-content:center;gap:5px;margin-bottom:8px;--bw:30px}
+.jdKb .row{display:flex;justify-content:center;gap:4px;margin-bottom:5px}.jdKb button{flex:1;max-width:40px;height:40px;border:1.5px solid var(--line);border-radius:5px;background:var(--key);color:var(--ink);font:700 16px var(--sans);padding:0;box-shadow:0 2px 0 var(--line)}
+.jdKb button.smNow{background:var(--hi);color:var(--hi-ink)}#smDemo .go.smNow{outline:3px solid var(--hi);outline-offset:2px}
+@media (max-height:640px){#smDemo .dcard{padding:8px 12px}#smDemo .dcard .meta{margin-bottom:5px}#smDemo .dcard .meta .len{font-size:13px;padding:2px 8px}#smDemo .clock{height:26px;margin-bottom:5px}#smDemo .clock b{font-size:15px;line-height:22px}#smDemo .dcard .word{font-size:20px;min-height:23px}#smDemo .dcard .def{font-size:14px}.jdSp{margin-top:7px;padding-top:5px}.jdSp .bxs{--bw:24px;margin-bottom:5px}.jdKb button{height:34px;font-size:15px}.jdKb .row{margin-bottom:4px}}
 </style>
 </head>
 <body>
@@ -239,12 +256,6 @@ body.oncover #top,body.oncover #pastTag,body.oncover #theme,body.oncover #pips,b
 
 <div class="sheet" id="sHelp" hidden><div class="box2 help">
   <button class="x" data-close>×</button><h2>How to Play</h2>
-  <div class="demo" aria-hidden="true">
-    <div class="dm-meta"><span id="dmCard">Card 1</span><span class="len" id="dmLen">3 letters</span></div>
-    <div class="dm-def" id="dmDef">A small furry pet that purrs.</div>
-    <div class="dm-boxes" id="dmBoxes"></div>
-    <div class="dm-note" id="dmNote">&nbsp;</div>
-  </div>
   <ul>
     <li>Each day: a theme and <b>5 cards</b>, easy to hard.</li>
     <li>Read the definition, tap <b>Spell it</b>, and type the word <b>one letter at a time</b>.</li>
@@ -253,6 +264,7 @@ body.oncover #top,body.oncover #pastTag,body.oncover #theme,body.oncover #pips,b
     <li>Always the full word: <i>refrigerator</i>, not <i>fridge</i>.</li>
   </ul>
   <p class="hsmall">New game at midnight Eastern. Past days are in the Archive. <span id="termsLine">By playing, you agree to the smAisle <a href="https://smaisle.app/about.html" target="_blank" rel="noopener">Terms and Privacy</a>. Opens and plays are counted anonymously.</span></p>
+  <button class="go alt" id="helpDemo">Try the demo</button>
   <button class="go" data-close id="helpGo">Play</button>
 </div></div>
 
@@ -270,8 +282,35 @@ body.oncover #top,body.oncover #pastTag,body.oncover #theme,body.oncover #pips,b
 <div id="toast"></div>
 
 <script>
+/* smAisle demo frame v1 (Nov 4, 2026). One demo for every game: Try it with a coach (change list #30).
+   Add demo-frame.css to the page, this script after it, then call:
+   smDemo({name:'Game',moves:[{cap:'What to do',nudge:'What to say after a wrong tap'},...],win:'How you win',
+     play:function(){start the real game},
+     board:function(stage){draw a tiny practice board in stage; return {to:function(n){show the board after n moves},
+       tgt:function(n){return the element to tap for move n},win:function(){show the finished board}}},
+     auto:true for fast games that can't pause (it plays itself, model B)});
+   Uses the page's --paper --card --ink --ink2 --btn --hi colors. Saves nothing and counts nothing. */
+function smDemo(o){
+ var E=function(h){var t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild},root=document.getElementById('smDemo'),timers=[],k=0,busy=false,B,stage,capT,capN,capH,dots,slot;
+ var HAND='<svg viewBox="0 0 38 46" aria-hidden="true"><path d="M13 2c3 0 5 2 5 5v11l11 2c4 1 6 3 6 7l-1 9c-1 5-4 8-9 8H17c-3 0-5-1-7-4L3 29c-2-3 2-6 5-4l1 1 0-19c0-3 2-5 4-5z" fill="#ffe27a" stroke="#1a1814" stroke-width="2.4" stroke-linejoin="round"/></svg>';
+ var TOP='<div class="smTop"><span><b>DEMO</b><i>Practice only. Nothing counts.</i></span><button type="button" id="smSkip">Skip</button></div>';
+ if(root)root.remove();root=E('<div id="smDemo" role="dialog" aria-label="'+o.name+' demo"></div>');document.body.appendChild(root);
+ function later(f,ms){timers.push(setTimeout(f,ms))}function stop(){timers.forEach(clearTimeout);timers=[]}
+ function close(){stop();root.remove()}
+ function run(){stop();k=0;busy=false;root.innerHTML=TOP+'<div class="smStage"></div><div class="smCap"><div class="smH"><b></b><small></small></div><p></p><div class="smDots"></div><div class="smSlot"></div></div>';root.querySelector('#smSkip').onclick=close;stage=root.querySelector('.smStage');var c=root.querySelector('.smCap');capH=c.querySelector('b');capN=c.querySelector('small');capT=c.querySelector('p');dots=c.querySelector('.smDots');slot=c.querySelector('.smSlot');B=o.board(stage);slot.innerHTML='<div class="smTurn">'+(o.auto?'Plays by itself':'Your turn. Tap where the finger points.')+'</div>';show();if(!o.auto)stage.onclick=tap}
+ function cap(h,i,n,t){capH.textContent=h;capN.textContent=n?'Step '+(i+1)+' of '+n:'Done';capT.textContent=t;capT.className='';dots.innerHTML=o.moves.map(function(m,j){return '<i class="'+(j<=i?'on':'')+'"></i>'}).join('')}
+ function fin(){var f=stage.querySelector('.smF');if(f)f.remove()}
+ function point(el){var f=stage.querySelector('.smF');if(!f){f=E('<div class="smF">'+HAND+'</div>');f.style.left=stage.clientWidth/2+'px';f.style.top=stage.clientHeight-60+'px';stage.appendChild(f);void f.offsetWidth}var a=el.getBoundingClientRect(),b=stage.getBoundingClientRect(),x=a.left-b.left+a.width/2,y=a.top-b.top+a.height-6;f.classList.toggle('up',y+46>stage.clientHeight);f.style.left=x+'px';f.style.top=(y+46>stage.clientHeight?a.top-b.top+6:y)+'px'}
+ function rip(el){var a=el.getBoundingClientRect(),b=stage.getBoundingClientRect(),r=E('<i class="smR"></i>');r.style.left=a.left-b.left+a.width/2+'px';r.style.top=a.top-b.top+a.height/2+'px';stage.appendChild(r);setTimeout(function(){r.remove()},520)}
+ function show(){B.to(k);cap('Your move',k,o.moves.length,o.moves[k].cap);var t=B.tgt(k);t.classList.add('smNow');point(t);busy=false;if(o.auto)later(function(){done(t)},1700)}
+ function done(t){busy=true;rip(t);fin();k++;if(k<o.moves.length){B.to(k);later(show,o.auto?900:450)}else{B.to(k);later(function(){B.win();cap('How you win',k-1,0,o.win);slot.innerHTML='';later(ready,1500)},900)}}
+ function tap(e){if(busy)return;var h=e.target.closest('.smNow');if(h){done(h);return}capT.textContent=o.moves[k].nudge;capT.className='nudge';var n=stage.querySelector('.smNow');if(n){n.classList.remove('smW');void n.offsetWidth;n.classList.add('smW')}}
+ function ready(){stop();fin();var p=E('<div class="smPop"><div class="smPc"><h3>You’re ready</h3><p>'+o.win+'</p><button type="button" class="smBtn" id="smPlay">Play</button><button type="button" class="smBtn alt" id="smAg">Demo again</button></div></div>');root.appendChild(p);root.querySelector('#smPlay').onclick=function(){close();o.play()};root.querySelector('#smAg').onclick=run}
+ run();return {close:close}}
+</script>
+<script>
 /* ---------- Version (bump on every change; keep the Claude link and GitHub copies the same) ---------- */
-const VERSION='2.9',VDATE='Nov 4',GAME='jx';
+const VERSION='2.10',VDATE='Nov 4',GAME='jx';
 
 /* ---------- Daily themes. Day 1 is Nov 2, 2026; each day uses the next theme (cycles when the list runs out).
    Five words per day, easiest first. Every word is a noun, and the boxes show its length. ---------- */
@@ -420,7 +459,7 @@ function buildKb(){
   $('kb').addEventListener('pointerdown',e=>{const b=e.target.closest('button');if(!b)return;e.preventDefault();press(b.dataset.k)});
 }
 document.addEventListener('keydown',e=>{
-  if(e.metaKey||e.ctrlKey||e.altKey||document.querySelector('.sheet:not([hidden])'))return;
+  if(e.metaKey||e.ctrlKey||e.altKey||document.querySelector('.sheet:not([hidden])')||$('smDemo'))return;
   if(/^[a-z]$/i.test(e.key)){if(!spellOpen&&!G.done&&G.k<word().length)openSpell();press(e.key.toUpperCase())}
   else if(e.key==='Enter'){const b=$('nextBtn')||$('spellBtn');if(b)b.click()}
 });
@@ -495,27 +534,36 @@ function showCover(){
     <div class="tag">Read the definition. Spell the word, one letter at a time. One wrong letter and you’re out.</div>
     <div class="date">No. ${t} · ${shortDate(today())} · <b>${TH[0]}</b></div>
     <button class="play" id="cvPlay"><span><span class="t">Today’s game</span><br><span class="s">${pv?'Free preview · card 1':'5 cards + ⚡ bonus'}</span></span><span class="go2">${st}</span></button>
-    <div class="links">${pv?'':'<button id="cvArch">Archive</button> · '}<button id="cvStats">Stats</button> · <button id="cvHelp">How to Play</button>${pv?'':' · <button id="cvPract">Practice</button>'}</div>
+    <div class="links">${pv?'':'<button id="cvArch">Archive</button> · '}<button id="cvStats">Stats</button> · <button id="cvHelp">How to Play</button>${pv?'':' · <button id="cvPract">Practice</button>'}<br><button id="cvDemo">Try the demo</button></div>
     <div class="ver"><a href="https://smaisle.app/">smAisle Home</a> · v${VERSION} · ${VDATE}</div>`;
   document.body.classList.add('oncover');$('cover').hidden=false;
-  $('cvPlay').onclick=hideCover;$('cvStats').onclick=showStats;$('cvHelp').onclick=()=>only('sHelp');
+  $('cvPlay').onclick=hideCover;$('cvStats').onclick=showStats;$('cvHelp').onclick=()=>only('sHelp');$('cvDemo').onclick=openDemo;
   if(!pv){$('cvArch').onclick=showArchive;$('cvPract').onclick=()=>{hideCover();practice()}}
 }
 function hideCover(){document.body.classList.remove('oncover');$('cover').hidden=true;draw()}
-/* How to Play demo: a right answer (CAT), then a miss (DOG, typed D-O-T), on a loop while the sheet is open */
-const DEMO=[{w:'CAT',def:'A small furry pet that purrs.',typed:'CAT'},{w:'DOG',def:'A loyal pet that barks and fetches.',typed:'DOT'}];
-let demoT=null;
-function demoRun(i,step){
-  clearTimeout(demoT);if($('sHelp').hidden)return;const d=DEMO[i],n=step;
-  $('dmCard').textContent='Card '+(i+1);$('dmLen').textContent=d.w.length+' letters';$('dmDef').textContent=d.def;
-  let h='',note='&nbsp;',cls='';
-  for(let k=0;k<d.w.length;k++){
-    if(k<n){const c=d.typed[k],ok=c===d.w[k];h+=`<div class="box ${ok?'ok':'bad'}">${c}</div>`;if(!ok){note='Wrong letter: you’re out!';cls='bad';break}}
-    else h+=`<div class="box${k===n?' cur':''}"></div>`}
-  if(n>=d.w.length&&d.typed===d.w){note='✓ Spelled! On to the next card';cls='ok'}
-  $('dmBoxes').innerHTML=h;const e=$('dmNote');e.innerHTML=note;e.className='dm-note '+cls;
-  const done=cls!=='';demoT=setTimeout(()=>done?demoRun((i+1)%DEMO.length,0):demoRun(i,n+1),done?1800:(n===0?1100:650));
-}
+/* The demo: Try it with a coach, on a practice card of its own. It never touches G, saves nothing and has no clock.
+   How to Play stays open underneath, so Skip goes back to where you were and a card's clock stays stopped. */
+function jxBoard(stage){
+  stage.innerHTML='<div class="jdB"></div>';const B=stage.firstChild;
+  const card=(word,clock,extra)=>`<div class="dcard${extra?' ok':''}"><div class="meta"><span>Card 1 of 5</span><span class="len">2 letters</span></div>
+    ${clock?'<div class="clock"><i style="width:100%"></i><b>20s</b></div>':''}<div class="word">${word}</div><p class="def">A strong farm animal that pulls a plow.</p>${extra}</div>`;
+  const kb=()=>'<div class="jdKb">'+['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'].map(r=>`<div class="row">${[...r].map(c=>`<button type="button" data-k="${c}">${c}</button>`).join('')}</div>`).join('')+'</div>';
+  return {to(n){
+      if(n===0){B.innerHTML=card('<span class="q">? ? ?</span>',1,'')+'<button type="button" class="go" data-k="spell">Spell it</button>';return}
+      const k=Math.min(n-1,2),t='OX'.slice(0,k),boxes=[...t].map(c=>`<div class="box ok">${c}</div>`).join('')+(k<2?'<div class="box cur"></div>':'');
+      B.innerHTML=card(k?t+(k<2?'<span class="q">…</span>':''):'<span class="q">? ? ?</span>',1,'')+`<div class="jdSp"><div class="hd">Card 1 · 2 letters</div><div class="bxs">${boxes}</div>${kb()}</div>`},
+    tgt(n){return B.querySelector(n===0?'[data-k=spell]':n===1?'[data-k=O]':'[data-k=X]')},
+    win(){B.innerHTML=card('Ox',0,'<div class="stamp ok">Spelled</div>')+'<button type="button" class="go hi" tabindex="-1">Next card ›</button>'}}}
+function openDemo(){
+  smDemo({name:'Jexicon',moves:[
+    {cap:'Read the definition and guess the word. The clock is off in this demo. Tap Spell it.',nudge:'Tap Spell it to bring up the letters.'},
+    {cap:'Spell one letter at a time. Green means right. The word is OX, so tap O.',nudge:'A wrong letter ends a real game. Tap O.'},
+    {cap:'One more letter. Tap X.',nudge:'A wrong letter ends a real game. Tap X.'}],
+    win:'Spell all 5 cards. One wrong letter or 20 seconds up and you’re out.',
+    play(){closeSheets();
+      if(!BON){if(PRACTICE||PAST)load(today());hideCover()}
+      if(!agreed()){store.set(TERMS_KEY,new Date().toISOString());checkIn('open')}},
+    board:jxBoard})}
 /* Finish screen standard (Nov 2): its own "‹ smAisle Daily" button, plus a "More smAisle games" row of the
    other games' icons from https://smaisle.app/daily/games.js (window.SMAISLE.games), each linking to its game. */
 const MORE_FALLBACK=[['d15','The Daily 15','daily-15','DailyGrid'],['abc','A, B, C, Deal','abc-deal','abcdeal'],['gr','Gramble','gramble','gramble'],['cs','Capital Ship','capital-ship','CapitalShip'],['bw','Blipword','blipword','Blipword']]
@@ -596,14 +644,14 @@ function showArchive(){
 }
 
 /* ---------- Sheets and menu ---------- */
-function only(id){closeSheets();closeSpell();$(id).hidden=false;if(id==='sHelp')demoRun(0,0)}
+function only(id){closeSheets();closeSpell();$(id).hidden=false}
 function closeSheets(){document.querySelectorAll('.sheet').forEach(s=>s.hidden=true)}
 document.querySelectorAll('.sheet').forEach(s=>{s.addEventListener('click',e=>{if(e.target===s||e.target.closest('[data-close]'))s.hidden=true})});
 $('menuBtn').onclick=()=>{$('mPlus').hidden=!isPreview();only('sMenu')};$('mPlus').onclick=()=>only('sPlus');$('plusGo').onclick=goDaily;
 $('mHelp').onclick=()=>only('sHelp');$('mArch').onclick=showArchive;$('mStats').onclick=showStats;$('mPract').onclick=practice;
 $('mDaily').onclick=goDaily;$('mHome').onclick=showCover;
 $('helpGo').addEventListener('click',()=>{if(!$('cover').hidden)hideCover();if(!agreed()){store.set(TERMS_KEY,new Date().toISOString());checkIn('open')}});
-$('mSet').onclick=()=>only('sSet');$('setBack').onclick=()=>only('sMenu');
+$('helpDemo').onclick=openDemo;$('mSet').onclick=()=>only('sSet');$('setBack').onclick=()=>only('sMenu');
 $('menuVer').textContent=`Jexicon · v${VERSION} · ${VDATE} · smAisle`;
 
 /* Dark mode: Off (smAisle colors, the default) / On (Navy) / Match phone. Shared on smaisle.app as localStorage "smaisle-dark". */
