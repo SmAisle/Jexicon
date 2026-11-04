@@ -271,11 +271,11 @@ body.oncover #top,body.oncover #pastTag,body.oncover #theme,body.oncover #pips,b
 
 <script>
 /* ---------- Version (bump on every change; keep the Claude link and GitHub copies the same) ---------- */
-const VERSION='2.10',VDATE='Nov 4',GAME='jx';
+const VERSION='2.11',VDATE='Nov 4',GAME='jx';
 
 /* ---------- Daily themes. Day 1 is Nov 2, 2026 (a Monday). A theme's place in this list sets its difficulty:
-   index%7 is its weekday, 0 = Monday (easiest) to 6 = Sunday (hardest). Keep the list a multiple of 7 and add new themes in
-   that repeating order. The first 35 are the first cycle (Nov 2 to Dec 6, 2026), never reorder them. See themeFor for the rest.
+   index%7 is its weekday, 0 = Monday (easiest) to 6 = Sunday (hardest). Add new themes in that repeating order, or at the end
+   on purpose for the weekday they need. The first 35 are the first cycle (Nov 2 to Dec 6, 2026), never reorder them. See themeFor for the rest.
    Five words per day, easiest first. Every word is a noun, and the boxes show its length. ---------- */
 const THEMES=[
  ["Office", [["DESK", "A table with drawers where you sit to work"], ["STAPLER", "A hand tool that joins sheets of paper by pushing a thin metal clip through them"], ["CALENDAR", "A chart of the days, weeks and months of the year, used to plan meetings"], ["RECEPTIONIST", "The person at the front desk who greets visitors and answers the phone"], ["STATIONERY", "Writing paper, envelopes and similar supplies"]], ["SHREDDER", "A machine that cuts documents into thin strips so no one can read them"]],
@@ -432,6 +432,13 @@ const THEMES=[
  ["Magic show", [["WAND", "The short black stick with a white tip"], ["ASSISTANT", "The partner who gets sawed in half"], ["ILLUSION", "A trick that fools the eye"], ["SLEIGHT", "Clever handiwork that hides a card; it rhymes with night"], ["LEVITATION", "Seeming to float someone in midair"]], ["ABRACADABRA", "The classic word said just before the rabbit appears"]],
  ["Tennis", [["DEUCE", "A tie at 40 all"], ["VOLLEY", "A shot hit before the ball bounces"], ["RACQUET", "The strung frame you swing"], ["BACKHAND", "A stroke swung across the body"], ["TIEBREAKER", "The short decider played at six games all"]], ["GROUNDSTROKE", "A shot hit after the ball has bounced"]],
  ["Eyes and ears", [["IRIS", "The colored ring around the pupil"], ["CORNEA", "The clear front layer of the eye"], ["RETINA", "The light-sensitive lining at the back of the eye"], ["EARDRUM", "The thin membrane that vibrates with sound"], ["COCHLEA", "The snail-shaped spiral of the inner ear"]], ["OPTOMETRIST", "The professional who tests your vision and prescribes glasses"]],
+ ["Christmas", [["CAROL", "A song sung door to door in December"], ["SLEIGH", "The flying sled that carries Santa"], ["WREATH", "A ring of evergreen on the front door"], ["ORNAMENT", "A shiny ball you hang on the tree"], ["REINDEER", "One of the antlered team that includes Dasher and Rudolph"]], ["MISTLETOE", "The green sprig you hang up and kiss under"]],
+ ["Valentine's Day", [["ROSE", "The red flower sold by the dozen"], ["CUPID", "The winged boy with a bow and arrow"], ["ROMANCE", "The candlelit side of love"], ["ADMIRER", "A secret sender of an unsigned card"], ["CHOCOLATE", "The sweet treat in a heart-shaped box"]], ["SWEETHEART", "A dear one, or a candy heart with a message"]],
+ ["Independence Day", [["FLAG", "The Stars and Stripes"], ["PARADE", "Marching bands and floats rolling down Main Street"], ["BARBECUE", "A backyard cookout over hot coals"], ["FIREWORKS", "Colorful bursts in the night sky"], ["LIBERTY", "Freedom, or the name of the cracked bell in Philadelphia"]], ["DECLARATION", "The document signed in 1776, in short"]],
+ ["New Year's", [["TOAST", "A raised glass and a few good words"], ["CONFETTI", "Tiny bits of paper tossed in the air"], ["COUNTDOWN", "Ten, nine, eight and so on, down to zero"], ["NOISEMAKER", "A party horn or rattle"], ["RESOLUTION", "A promise you make to yourself every January"]], ["FESTIVITIES", "The joyful goings-on of a big celebration"]],
+ ["Halloween", [["WITCH", "The pointy-hatted broom rider"], ["GHOST", "A see-through spirit under a sheet"], ["VAMPIRE", "The caped count who hates garlic"], ["CAULDRON", "The big bubbling pot of a spell caster"], ["WEREWOLF", "A man who changes under a full moon"]], ["MASQUERADE", "A ball where the guests hide their faces"]],
+ ["Spring", [["THAW", "The melting of winter's ice"], ["BLOSSOM", "The pale flower on a cherry tree"], ["SEEDLING", "A young sprout just out of the soil"], ["MIGRATION", "The long journey north that birds make each year"], ["POLLINATION", "The work of bees that lets plants make seeds"]], ["HIBERNATION", "The long winter sleep that bears wake up from"]],
+ ["Fall", [["CIDER", "Pressed apple juice, sold by the jug at the orchard"], ["FOLIAGE", "The red and gold leaves that draw tourists to Vermont"], ["HARVEST", "The gathering of the year's crops"], ["SCARECROW", "A straw figure on a pole in the cornfield"], ["CORNUCOPIA", "The horn of plenty"]], ["ABSCISSION", "The natural shedding of leaves from a tree"]],
 ];
 /* Preview (a smAisle Daily Plus game): without Plus you get today's first card, then an "Unlock the rest" screen.
    Preview when the URL has ?preview=1, or inside the smAisle Daily app (window.SMD_APP) without Plus (window.DG_APP.plus).
@@ -447,15 +454,25 @@ function etParts(d){const p={};new Intl.DateTimeFormat('en-US',{timeZone:'Americ
 function today(){const p=etParts();return `${p.year}-${p.month}-${p.day}`}
 const dnum=s=>Math.round((Date.parse(s+'T12:00:00Z')-Date.parse(START+'T12:00:00Z'))/864e5)+1;
 const dateOf=n=>new Date(Date.parse(START+'T12:00:00Z')+(n-1)*864e5).toISOString().slice(0,10);
-/* Schedule. Days 1-35 are the fixed first cycle. From Dec 7, 2026 (day 36) the game runs in passes of THEMES.length days. In each pass every
-   weekday walks through its own themes in a fresh order, so a theme always lands on its own weekday. The order is worked out from
-   the weekday and pass number only, so everyone gets the same theme, forever. Each theme is kept at least MIN_GAP weeks (63 days) from its
-   last use, including across the seam between two passes. */
-const FIRST_CYCLE=35,PASS_WEEKS=THEMES.length/7,MIN_GAP=9;
-const PASSES=[[],[],[],[],[],[],[]];
+/* Schedule. Days 1-35 are the fixed first cycle. From Dec 7, 2026 (day 36) there are two kinds of theme, and both stay on their own
+   weekday, so Monday stays easiest and Sunday hardest:
+   - Seasonal themes (SEASONS) show once a year, on their weekday inside their window. Dates are month-day, and a window must not cross Jan 1.
+   - Every other theme is in the reshuffle: each weekday walks through its own themes in a fresh order, pass after pass. A seasonal day
+     takes that week's slot, and the regular theme it replaces simply waits for the next pass.
+   Everything is worked out from the date alone, so everyone gets the same theme, forever. Each theme is kept at least MIN_GAP weeks
+   (63 days) from its last use, including across the seam between two passes. */
+const FIRST_CYCLE=35,MIN_GAP=9;
+const SEASONS={"New Year's":['01-01','01-07'],"Winter":['01-08','02-28'],"Winter sports":['01-08','02-28'],"Valentine's Day":['02-07','02-14'],
+  "Spring":['03-21','05-31'],"Picnic":['05-01','09-15'],"Beach":['06-01','08-31'],"Independence Day":['06-28','07-04'],
+  "Fall":['09-22','11-20'],"Halloween":['10-17','10-31'],"Thanksgiving":['11-22','11-28'],"Christmas":['12-11','12-25']};
+const SEASON_LIST=THEMES.map((t,i)=>SEASONS[t[0]]?[i,...SEASONS[t[0]]]:null).filter(Boolean);
+const isSeasonal=i=>!!SEASONS[THEMES[i][0]];
+const inSeason=(i,s)=>{const w=SEASONS[THEMES[i][0]],md=s.slice(5);return !w||(md>=w[0]&&md<=w[1])};
+const REGULAR=[0,1,2,3,4,5,6].map(slot=>THEMES.map((_,i)=>i).filter(i=>i%7===slot&&!isSeasonal(i)));
+const PASSES=[[],[],[],[],[],[],[]],SEASON_YEARS={};
 function seeded(seed){return ()=>{seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296}}
 function nextOrder(slot,pass,prev){
-  const o=[];for(let w=0;w<PASS_WEEKS;w++)o.push(w*7+slot);
+  const o=REGULAR[slot].slice();
   const r=seeded(Math.imul(pass+1,0x9E3779B1)^Math.imul(slot+1,0x85EBCA77));
   for(let i=o.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[o[i],o[j]]=[o[j],o[i]]}
   const ago=t=>{const i=prev.lastIndexOf(t);return i<0?Infinity:prev.length-i};   // weeks back from the end of the last pass
@@ -464,8 +481,16 @@ function nextOrder(slot,pass,prev){
 function passOrder(slot,pass){const P=PASSES[slot];
   while(P.length<=pass){let prev=P[P.length-1];if(!prev){prev=[];for(let w=0;w<FIRST_CYCLE/7;w++)prev.push(w*7+slot)}P.push(nextOrder(slot,P.length,prev))}
   return P[pass]}
+/* The year's seasonal days: {date: theme index}. Skips the first cycle, and keeps a first-cycle theme 60+ days from its first-cycle day. */
+function seasonDays(y){if(SEASON_YEARS[y])return SEASON_YEARS[y];const m={};
+  SEASON_LIST.forEach(([i,a,b])=>{const c=[];
+    for(let t=Date.parse(y+'-'+a+'T12:00:00Z'),e=Date.parse(y+'-'+b+'T12:00:00Z');t<=e;t+=864e5){const d=new Date(t).toISOString().slice(0,10),n=dnum(d);
+      if(n>FIRST_CYCLE&&(n-1)%7===i%7&&!m[d]&&!(i<FIRST_CYCLE&&n-(i+1)<=60))c.push(d)}
+    if(c.length)m[c[Math.floor(seeded(Math.imul(y,0x9E3779B1)^Math.imul(i+1,0x85EBCA77))()*c.length)]]=i});
+  return SEASON_YEARS[y]=m}
 function themeIndex(s){const n=dnum(s);if(n<=FIRST_CYCLE)return ((n-1)%FIRST_CYCLE+FIRST_CYCLE)%FIRST_CYCLE;
-  const d=n-FIRST_CYCLE-1,slot=d%7,week=Math.floor(d/7);return passOrder(slot,Math.floor(week/PASS_WEEKS))[week%PASS_WEEKS]}
+  const sp=seasonDays(+s.slice(0,4))[s];if(sp!==undefined)return sp;
+  const d=n-FIRST_CYCLE-1,slot=d%7,week=Math.floor(d/7),len=REGULAR[slot].length;return passOrder(slot,Math.floor(week/len))[week%len]}
 const themeFor=s=>THEMES[themeIndex(s)];
 const niceDate=s=>new Date(s+'T12:00:00Z').toLocaleDateString('en-US',{timeZone:'UTC',weekday:'long',month:'long',day:'numeric'});
 const shortDate=s=>new Date(s+'T12:00:00Z').toLocaleDateString('en-US',{timeZone:'UTC',weekday:'short',month:'short',day:'numeric'});
@@ -479,8 +504,8 @@ const keyOf=d=>'jx-day-'+d;
 function load(d){PRACTICE=false;DATE=d;PAST=d!==today();TH=themeFor(d);G=store.json(keyOf(d),null)||{c:0,k:0,res:[],bad:'',done:false};}
 function save(){if(!PRACTICE)store.put(keyOf(DATE),G)}
 /* Practice: play any other theme from the list, one after another. Nothing is saved or counted (no stats, streak or check-in). */
-function practice(){document.body.classList.remove('oncover');$('cover').hidden=true;const n=THEMES.length,base=themeIndex(today());let i=+store.get('jx-practice','0')||0;i=i%(n-1)+1;store.set('jx-practice',String(i));
-  PRACTICE=true;PAST=true;DATE=today();TH=THEMES[(base+i)%n];G={c:0,k:0,res:[],bad:'',done:false};closeSheets();draw()}
+function practice(){document.body.classList.remove('oncover');$('cover').hidden=true;const now=themeIndex(today()),list=THEMES.map((_,i)=>i).filter(i=>i!==now&&inSeason(i,today())),n=list.length;let i=+store.get('jx-practice','0')||0;i=i%n+1;store.set('jx-practice',String(i));
+  PRACTICE=true;PAST=true;DATE=today();TH=THEMES[list[(now+i)%n]];G={c:0,k:0,res:[],bad:'',done:false};closeSheets();draw()}
 const word=()=>TH[1][G.c][0];
 
 /* ---------- Drawing ---------- */

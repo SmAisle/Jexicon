@@ -30,3 +30,8 @@ A daily definition spelling game by smAisle. Read the definition, then spell the
 ## v2.10 (Nov 4)
 - More content: 154 themes (924 words), up from 35. Monday's theme is still the easiest and Sunday's the hardest: a theme's place in the list (index%7) sets its weekday, so new themes go in that repeating order, seven at a time.
 - Schedule: Nov 2 to Dec 6, 2026 is unchanged. From Dec 7, 2026 each pass is 154 days (22 weeks), every weekday reshuffles its own 22 themes by itself, the same for everyone, and a theme comes back no sooner than 63 days later.
+
+## v2.11 (Nov 4)
+- Seasonal themes stay in season. 161 themes (966 words): 7 new ones (Christmas, Valentine's Day, Independence Day, New Year's, Halloween, Spring, Fall). From Dec 7, 2026, 12 seasonal themes show once a year, on their own weekday, inside their window (`SEASONS` in `index.html`). Thanksgiving lands on Thanksgiving Day itself.
+- Everything else stays in the reshuffle, weekday by weekday, with passes now 21 to 22 weeks. A seasonal day takes that week's slot and the regular theme waits for the next pass.
+- Practice never shows today's theme or a seasonal theme out of season.
