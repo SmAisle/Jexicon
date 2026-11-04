@@ -560,7 +560,7 @@ function drawTop(){
   $('themeName').textContent=TH[0];
   $('theme').firstChild.nodeValue=(PAST?'Theme ':"Today's theme ");
   $('pastTag').hidden=!PAST;$('pastTag').textContent=RET?'For fun · score stays locked':PRACTICE?'Practice · not counted':'Archive · '+niceDate(DATE);
-  $('noLbl').textContent=PRACTICE?'Practice':'No. '+dnum(DATE);
+  $('noLbl').textContent=RET?'For fun':PRACTICE?'Practice':'No. '+dnum(DATE);
   const pv=isPreview()&&!PRACTICE&&!PAST;$('mArch').hidden=$('mPract').hidden=isPreview();
   $('pips').innerHTML=TH[1].map((_,i)=>{if(pv&&i>0)return '<div class="pip lock">🔒</div>';const r=G.res[i];const cls=r==='W'?'w':r==='L'?'l':(!G.done&&i===G.c?'now':'');return `<div class="pip ${cls}">${r==='W'?'✓':r==='L'?'✕':i+1}</div>`}).join('');
 }
