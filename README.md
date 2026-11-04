@@ -26,3 +26,7 @@ A daily definition spelling game by smAisle. Read the definition, then spell the
 ## v2.7 (Nov 3)
 - Menu standard (Jeff): the menu now matches Straight Down Spell. Top to bottom: Menu, Back to game (new), then the two-column grid, Home Screen and ‹ smAisle Daily side by side, Settings, version.
 - The ⭐ Plus row shows only in the preview and opens the Plus sheet (new for Jexicon, the same words as the end-of-preview screen, because that screen shows the first card's answer). Plus players and the plain website don't see it.
+
+## v2.10 (Nov 4)
+- More content: 154 themes (924 words), up from 35. Monday's theme is still the easiest and Sunday's the hardest: a theme's place in the list (index%7) sets its weekday, so new themes go in that repeating order, seven at a time.
+- Schedule: Nov 2 to Dec 6, 2026 is unchanged. From Dec 7, 2026 each pass is 154 days (22 weeks), every weekday reshuffles its own 22 themes by itself, the same for everyone, and a theme comes back no sooner than 63 days later.
