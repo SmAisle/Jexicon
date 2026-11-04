@@ -81,7 +81,7 @@ body:not(.oncover) #dailyBar{display:none}
 .clock{position:relative;height:34px;border:2px solid var(--line);background:var(--paper2);margin:4px 0 12px;overflow:hidden}
 .clock i{position:absolute;left:0;top:0;bottom:0;background:var(--hi);transition:width .1s linear}
 .clock i.low{background:var(--red)}
-.clock b{position:relative;display:block;text-align:center;font:800 20px/30px var(--sans);font-variant-numeric:tabular-nums} .go.hi{background:var(--hi);color:var(--hi-ink)}
+.clock b{position:relative;display:block;text-align:center;font:800 20px/30px var(--sans);font-variant-numeric:tabular-nums} .go.hi{background:var(--hi);color:var(--hi-ink)} .gorow{display:flex;gap:8px}.gorow .go{flex:1 1 0;min-width:0;padding-left:4px;padding-right:4px;font-size:14px;white-space:nowrap}
 .small{font:600 13px var(--sans);color:var(--ink2);text-align:center;margin-top:12px}
 .link{background:none;border:0;text-decoration:underline;font:600 13px var(--sans);color:var(--ink2);padding:6px}
 /* spelling panel: pops up from the bottom */
@@ -310,7 +310,7 @@ function smDemo(o){
 </script>
 <script>
 /* ---------- Version (bump on every change; keep the Claude link and GitHub copies the same) ---------- */
-const VERSION='2.12',VDATE='Nov 4',GAME='jx';
+const VERSION='2.13',VDATE='Nov 4',GAME='jx';
 
 /* ---------- Daily themes. Day 1 is Nov 2, 2026 (a Monday). A theme's place in this list sets its difficulty:
    index%7 is its weekday, 0 = Monday (easiest) to 6 = Sunday (hardest). Add new themes in that repeating order, or at the end
@@ -570,9 +570,9 @@ function draw(){
     <p class="def">${def}.</p>
     ${passed?'<div class="stamp ok">Spelled</div>':''}
   </div>
-  ${passed?`<button class="go hi" id="nextBtn">${G.c+1<CARDS?'Next card ›':'See your result ›'}</button>`:`<button class="go" id="spellBtn">${G.k?'Keep spelling':'Spell it'}</button>`}
+  ${passed?(G.c+1<CARDS?`<button class="go hi" id="nextBtn">Next card ›</button>`:`<div class="gorow"><button class="go hi" id="nextBtn">See your result ›</button><button class="go hi" id="endDaily" style="text-transform:none">‹ smAisle Daily</button></div>`):`<button class="go" id="spellBtn">${G.k?'Keep spelling':'Spell it'}</button>`}
   <div class="small">${PRACTICE?'Practice game: it isn’t counted.':PAST?'Archive game: it won’t change your streak.':'One wrong letter and the game is over.'}</div>`;
-  if(passed)$('nextBtn').onclick=nextCard;else $('spellBtn').onclick=openSpell;
+  if(passed)$('nextBtn').onclick=nextCard;else $('spellBtn').onclick=openSpell;if($('endDaily'))$('endDaily').onclick=goDaily;
   drawBoxes();paintClock();
 }
 function drawBoxes(){
@@ -757,9 +757,9 @@ function drawResult(){
     <div class="msg">${MSG[s]}</div>
   </div>
   ${bonusBlock()}
-  ${PRACTICE?'':'<button class="go hi" id="shareBtn">Share result</button>'}
+  ${PRACTICE?'<button class="go hi" id="resDaily" style="text-transform:none">‹ smAisle Daily</button>':'<div class="gorow"><button class="go hi" id="shareBtn">Share result</button><button class="go hi" id="resDaily" style="text-transform:none">‹ smAisle Daily</button></div>'}
   <button class="go ${PRACTICE?'hi':'alt'}" id="practBtn">Practice another theme</button>
-  ${moreGames()}
+  ${moreGames(true)}
   ${PAST?`<button class="go alt" id="backToday">Back to today</button>`:`<div class="small">Next game in <div class="countdown" id="cd"></div></div>`}
   <div class="small"><button class="link" id="rArch">Archive</button> · <button class="link" id="rStats">Stats</button></div>
   <h3 style="font:800 12px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin:18px 0 6px">${PAST?'The':'Today’s'} words</h3>
