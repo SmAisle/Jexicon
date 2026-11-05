@@ -31,4 +31,4 @@ A daily definition spelling game by smAisle. Read the definition, then spell the
 - One demo for every game (change list #30): Try it with a coach. The old looping demo in How to Play is gone. "Try the demo" is in How to Play and on the cover. Three real moves on a practice card with the clock off, using the shared demo frame (inlined). Nothing is saved or counted, and How to Play stays open underneath so Skip goes back to it.
 
 ## v2.15 (Nov 4)
-Finished game: the yellow ‹ smAisle Daily button sits beside Share result (Practice: right above Practice another theme), and beside See your result if that card shows, so it's on screen without scrolling even on small phones. It moved up from the lower More games block; nothing else changed.
+Finished game: the yellow ‹ smAisle Daily button sits beside Share result, right under the score card (Practice: on its own row there), and beside See your result if that card shows, so it's on screen without scrolling even on small phones. It moved up from the lower More games block; nothing else changed.

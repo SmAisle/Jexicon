@@ -781,10 +781,10 @@ function drawResult(){
     <div class="sq">${squares(G)}</div>
     <div class="msg">${RET?'For fun. Your score stays locked.':MSG[s]}</div>
   </div>
+  ${PRACTICE?'<button class="go hi" id="resDaily" style="text-transform:none">‹ smAisle Daily</button>':'<div class="gorow"><button class="go hi" id="shareBtn">Share result</button><button class="go hi" id="resDaily" style="text-transform:none">‹ smAisle Daily</button></div>'}
   ${RET?'':bonusBlock()}
   ${(!PRACTICE||RET)&&G.res.includes('L')?'<button class="go alt" id="retryBtn">Try again for fun</button>':''}
   ${RET?'<button class="go hi" id="funBack">Back to my result</button>':''}
-  ${PRACTICE?'<button class="go hi" id="resDaily" style="text-transform:none">‹ smAisle Daily</button>':'<div class="gorow"><button class="go hi" id="shareBtn">Share result</button><button class="go hi" id="resDaily" style="text-transform:none">‹ smAisle Daily</button></div>'}
   <button class="go ${PRACTICE?'hi':'alt'}" id="practBtn">Practice another theme</button>
   ${moreGames(true)}
   ${RET?'':PAST?`<button class="go alt" id="backToday">Back to today</button>`:`<div class="small">Next game in <div class="countdown" id="cd"></div></div>`}
